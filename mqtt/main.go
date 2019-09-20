@@ -105,7 +105,7 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 			log.Println(err)
 		} else {
 			ts.ss()
-			log.Printf("Updated speed to %d by MQTT request\n", req.Speed)
+			log.Printf("Updated speed to %d by MQTT request\n", *req.Speed)
 		}
 
 	} else {
