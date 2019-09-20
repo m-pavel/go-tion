@@ -15,13 +15,13 @@ import (
 
 type Request struct {
 	Gate   string `json:"gate"`
-	On     bool   `json:"on"`
+	On     *bool   `json:"on"`
 	Heater bool   `json:"heater"`
 	Sound  bool   `json:"sound"`
 	Out    int8   `json:"temp_out"`
 	In     int8   `json:"temp_in"`
 	Target int8   `json:"temp_target"`
-	Speed  int8   `json:"speed"`
+	Speed  *int8   `json:"speed"`
 }
 
 type TionService struct {
@@ -69,12 +69,12 @@ func (ts TionService) Do() (interface{}, error) {
 	}
 	return &Request{
 		Gate:   s.GateStatus(),
-		On:     s.Enabled,
+		On:     &s.Enabled,
 		Heater: s.HeaterEnabled,
 		Out:    s.TempOut,
 		In:     s.TempIn,
 		Target: s.TempTarget,
-		Speed:  s.Speed,
+		Speed:  &s.Speed,
 		Sound:  s.SoundEnabled,
 	}, nil
 }
@@ -98,31 +98,45 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		return
 	}
 
-	if cs.Enabled {
-		if !req.On {
-			cs.Enabled = false
-			err = ts.t.Update(cs, 7)
-			if err != nil {
-				log.Println(err)
-			} else {
-				ts.ss()
-				log.Println("Turned off by MQTT request")
-			}
+	if req.Speed != nil && *req.Speed != cs.Speed{
+		cs.Speed = *req.Speed
+		err = ts.t.Update(cs, 7)
+		if err != nil {
+			log.Println(err)
 		} else {
-			log.Println("Already on")
+			ts.ss()
+			log.Printf("Updated speed to %d by MQTT request\n", req.Speed)
 		}
+
 	} else {
-		if req.On {
-			cs.Enabled = true
-			err = ts.t.Update(cs, 7)
-			if err != nil {
-				log.Println(err)
+		if req.On != nil {
+			if cs.Enabled {
+				if !*req.On {
+					cs.Enabled = false
+					err = ts.t.Update(cs, 7)
+					if err != nil {
+						log.Println(err)
+					} else {
+						ts.ss()
+						log.Println("Turned off by MQTT request")
+					}
+				} else {
+					log.Println("Already on")
+				}
 			} else {
-				ts.ss()
-				log.Println("Turned on  by MQTT request")
+				if *req.On {
+					cs.Enabled = true
+					err = ts.t.Update(cs, 7)
+					if err != nil {
+						log.Println(err)
+					} else {
+						ts.ss()
+						log.Println("Turned on  by MQTT request")
+					}
+				} else {
+					log.Println("Already off")
+				}
 			}
-		} else {
-			log.Println("Already off")
 		}
 	}
 	log.Println("Control done.")
