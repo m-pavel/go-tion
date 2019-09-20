@@ -8,20 +8,21 @@ import (
 	_ "net/http/pprof"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
-	"github.com/m-pavel/go-tion/tion"
-	"github.com/m-pavel/go-tion/gatt"
 	"github.com/m-pavel/go-hassio-mqtt/pkg"
+	"github.com/m-pavel/go-tion/gatt"
+	"github.com/m-pavel/go-tion/tion"
 )
 
 type Request struct {
-	Gate   string `json:"gate"`
-	On     *bool   `json:"on"`
-	Heater bool   `json:"heater"`
-	Sound  bool   `json:"sound"`
-	Out    int8   `json:"temp_out"`
-	In     int8   `json:"temp_in"`
-	Target int8   `json:"temp_target"`
-	Speed  *int8   `json:"speed"`
+	Gate          string `json:"gate"`
+	On            *bool  `json:"on"`
+	Heater        bool   `json:"heater"`
+	Sound         bool   `json:"sound"`
+	Out           int8   `json:"temp_out"`
+	In            int8   `json:"temp_in"`
+	Target        int8   `json:"temp_target"`
+	Speed         *int8  `json:"speed"`
+	FilterRemains int    `json:"filters"`
 }
 
 type TionService struct {
@@ -68,14 +69,15 @@ func (ts TionService) Do() (interface{}, error) {
 		log.Println(s.BeautyString())
 	}
 	return &Request{
-		Gate:   s.GateStatus(),
-		On:     &s.Enabled,
-		Heater: s.HeaterEnabled,
-		Out:    s.TempOut,
-		In:     s.TempIn,
-		Target: s.TempTarget,
-		Speed:  &s.Speed,
-		Sound:  s.SoundEnabled,
+		Gate:          s.GateStatus(),
+		On:            &s.Enabled,
+		Heater:        s.HeaterEnabled,
+		Out:           s.TempOut,
+		In:            s.TempIn,
+		Target:        s.TempTarget,
+		Speed:         &s.Speed,
+		Sound:         s.SoundEnabled,
+		FilterRemains: s.FiltersRemains,
 	}, nil
 }
 
@@ -98,7 +100,7 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		return
 	}
 
-	if req.Speed != nil && *req.Speed != cs.Speed{
+	if req.Speed != nil && *req.Speed != cs.Speed {
 		cs.Speed = *req.Speed
 		err = ts.t.Update(cs, 7)
 		if err != nil {
