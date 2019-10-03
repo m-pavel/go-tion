@@ -83,7 +83,7 @@ func (t *tion) rw() (*tion2.Status, error) {
 	if err := t.g.Write(wchar, tion2.StatusRequest); err != nil {
 		return nil, err
 	}
-	time.Sleep(time.Second)
+	time.Sleep(2 * time.Second)
 	resp, n, err := t.g.Read(rchar)
 	if err != nil {
 		return nil, err
