@@ -84,12 +84,12 @@ func (t *tion) rw() (*tion2.Status, error) {
 		return nil, err
 	}
 	time.Sleep(time.Second)
-	resp, _, err := t.g.Read(rchar)
+	resp, n, err := t.g.Read(rchar)
 	if err != nil {
 		return nil, err
 	}
 	if t.debug {
-		log.Printf("RSP: %v\n", resp)
+		log.Printf("RSP [%d]: %v\n", n, resp)
 	}
 	return tion2.FromBytes(resp)
 }
