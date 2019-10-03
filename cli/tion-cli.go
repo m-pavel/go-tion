@@ -11,8 +11,8 @@ import (
 
 	"fmt"
 
-	"github.com/m-pavel/go-tion/tion"
 	"github.com/m-pavel/go-tion/gatt"
+	"github.com/m-pavel/go-tion/tion"
 )
 
 const timeout = 7
@@ -111,7 +111,7 @@ func main() {
 	if *status {
 		t := gatt.New(*device, *debug)
 		if err := t.Connect(); err != nil {
-			log.Println(err)
+			log.Printf("Connect error: %v\n", err)
 			return
 		}
 		defer t.Disconnect()
