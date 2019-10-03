@@ -80,7 +80,9 @@ func (t *tion) rw() (*tion2.Status, error) {
 	if !t.g.Connected() {
 		return nil, errors.New("Not connected")
 	}
-	err := t.g.Write(wchar, tion2.StatusRequest)
+	if err := t.g.Write(wchar, tion2.StatusRequest); err != nil {
+		return nil, err
+	}
 	time.Sleep(time.Second)
 	resp, _, err := t.g.Read(rchar)
 	if err != nil {
