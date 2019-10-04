@@ -42,6 +42,13 @@ func (n *nativeTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 	if n.debug {
 		log.Printf("RSP [%d]: %v\n", len(resp), resp)
 	}
+	resp, err = n.p.ReadCharacteristic(n.rc)
+	if err != nil {
+		return nil, err
+	}
+	if n.debug {
+		log.Printf("RSP [%d]: %v\n", len(resp), resp)
+	}
 	return tion.FromBytes(resp)
 }
 
