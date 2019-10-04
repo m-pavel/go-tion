@@ -2,7 +2,9 @@ package tionn
 
 import (
 	"log"
+	"time"
 
+	"errors"
 	"fmt"
 
 	"github.com/m-pavel/go-tion/tion"
@@ -20,15 +22,15 @@ func New(addr string, debug ...bool) tion.Tion {
 	return &nt
 }
 
-func (n *nativeTion) ReadState(timeout int) (*tion.Status, error) {
+func (n *nativeTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 	return nil, nil
 }
 
-func (n *nativeTion) Update(s *tion.Status, timeout int) error {
+func (n *nativeTion) Update(s *tion.Status, timeout time.Duration) error {
 	return nil
 }
 
-func (n *nativeTion) Connect() error {
+func (n *nativeTion) Connect(timeout time.Duration) error {
 	var DefaultClientOptions = []gatt.Option{
 		gatt.LnxMaxConnections(1),
 		gatt.LnxDeviceID(-1, false),
@@ -47,23 +49,26 @@ func (n *nativeTion) Connect() error {
 	if err = d.Init(onStateChanged); err != nil {
 		return err
 	}
-	return <-n.cnct
+
+	select {
+	case res := <-n.cnct:
+		return res
+	case <-time.After(timeout):
+		return errors.New(fmt.Sprintf("Connect timeout (%d)", timeout))
+	}
 }
 
 func (n *nativeTion) onPeriphDiscovered(p gatt.Peripheral, a *gatt.Advertisement, rssi int) {
-	fmt.Println(a.LocalName)
-	fmt.Println(p.ID())
-	fmt.Println(p)
-	fmt.Println(a)
-
-	if a.LocalName == "AAA" {
+	if p.ID() == n.addr {
 		p.Device().StopScanning()
 		p.Device().Connect(p)
 	}
 }
+
 func (n *nativeTion) onPeriphConnected(p gatt.Peripheral, err error) {
 	n.cnct <- err
 }
+
 func (n *nativeTion) onPeriphDisconnected(p gatt.Peripheral, err error) {
 	n.cnct <- err
 }

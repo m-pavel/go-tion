@@ -1,8 +1,12 @@
 package tion
 
+import "time"
+
 type Tion interface {
-	ReadState(timeout int) (*Status, error)
-	Update(s *Status, timeout int) error
-	Connect() error
+	Connect(timeout time.Duration) error
+
+	ReadState(timeout time.Duration) (*Status, error)
+	Update(s *Status, timeout time.Duration) error
+
 	Disconnect() error
 }

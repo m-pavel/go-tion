@@ -36,7 +36,7 @@ type cRes struct {
 	e error
 }
 
-func (t *tion) Connect() error {
+func (t *tion) Connect(timeout time.Duration) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	if t.g.Connected() {
@@ -53,7 +53,7 @@ func (t *tion) Disconnect() error {
 	return t.g.Disconnect()
 }
 
-func (t *tion) ReadState(timeout int) (*tion2.Status, error) {
+func (t *tion) ReadState(readtimeout time.Duration) (*tion2.Status, error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
@@ -71,7 +71,7 @@ func (t *tion) ReadState(timeout int) (*tion2.Status, error) {
 	select {
 	case res := <-c1:
 		return res.s, res.e
-	case <-time.After(time.Duration(timeout) * time.Second):
+	case <-time.After(readtimeout):
 		return nil, errors.New("Read timeout")
 	}
 }
@@ -94,7 +94,7 @@ func (t *tion) rw() (*tion2.Status, error) {
 	return tion2.FromBytes(resp)
 }
 
-func (t *tion) Update(s *tion2.Status, timeout int) error {
+func (t *tion) Update(s *tion2.Status, timeout time.Duration) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
@@ -111,7 +111,7 @@ func (t *tion) Update(s *tion2.Status, timeout int) error {
 	select {
 	case res := <-c1:
 		return res
-	case <-time.After(time.Duration(timeout) * time.Second):
+	case <-time.After(timeout):
 		return errors.New("Write timeout")
 	}
 }

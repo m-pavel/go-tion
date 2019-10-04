@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log"
 
+	"time"
+
 	"github.com/m-pavel/go-tion/tion"
 	"github.com/m-pavel/go-tion/tionn"
 )
 
-const timeout = 7
+const timeout = 7 * time.Second
 
 func main() {
 	var device = flag.String("device", "", "bt addr")
@@ -105,7 +107,7 @@ func main() {
 
 	if *status {
 		t := tionn.New(*device, *debug)
-		if err := t.Connect(); err != nil {
+		if err := t.Connect(timeout); err != nil {
 			log.Printf("Connect error: %v\n", err)
 			return
 		}
@@ -121,7 +123,7 @@ func main() {
 
 func deviceCall(addr string, dbg bool, cb func(tion.Tion, *tion.Status) error, succ string) error {
 	t := tionn.New(addr, dbg)
-	if err := t.Connect(); err != nil {
+	if err := t.Connect(timeout); err != nil {
 		return err
 	}
 	defer t.Disconnect()
