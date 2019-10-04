@@ -2,17 +2,11 @@ package main
 
 import (
 	"flag"
-	"log"
-	"time"
-
-	"github.com/go-ble/ble"
-
-	"github.com/m-pavel/go-gattlib/pkg"
-
 	"fmt"
+	"log"
 
-	"github.com/m-pavel/go-tion/gatt"
 	"github.com/m-pavel/go-tion/tion"
+	"github.com/m-pavel/go-tion/tionn"
 )
 
 const timeout = 7
@@ -104,12 +98,13 @@ func main() {
 	}
 
 	if *scanp {
-		scan()
+		//scan()
+		panic("Not supported")
 		return
 	}
 
 	if *status {
-		t := gatt.New(*device, *debug)
+		t := tionn.New(*device, *debug)
 		if err := t.Connect(); err != nil {
 			log.Printf("Connect error: %v\n", err)
 			return
@@ -125,7 +120,7 @@ func main() {
 }
 
 func deviceCall(addr string, dbg bool, cb func(tion.Tion, *tion.Status) error, succ string) error {
-	t := gatt.New(addr, dbg)
+	t := tionn.New(addr, dbg)
 	if err := t.Connect(); err != nil {
 		return err
 	}
@@ -144,9 +139,9 @@ func deviceCall(addr string, dbg bool, cb func(tion.Tion, *tion.Status) error, s
 	return err
 }
 
-func scan() {
-	gattlib.Scan(func(ad ble.Advertisement) {
-		log.Printf("%s %s", ad.Addr(), ad.LocalName())
-	}, 5)
-	time.Sleep(10 * time.Second)
-}
+//func scan() {
+//	gattlib.Scan(func(ad ble.Advertisement) {
+//		log.Printf("%s %s", ad.Addr(), ad.LocalName())
+//	}, 5)
+//	time.Sleep(10 * time.Second)
+//}
