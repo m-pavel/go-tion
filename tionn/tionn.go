@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 
+	"strings"
+
 	"github.com/m-pavel/go-tion/tion"
 	"github.com/paypal/gatt"
 )
@@ -98,14 +100,22 @@ func (n *nativeTion) onPeriphConnected(p gatt.Peripheral, err error) {
 
 		for _, c := range cs {
 			log.Printf("%v %v\n", service.UUID().String(), c.UUID().String())
-			if c.UUID().String() == tion.WRITE_CHARACT {
+			if c.UUID().String() == strings.Replace(tion.WRITE_CHARACT, "-", "", -1) {
 				n.wc = c
 			}
-			if c.UUID().String() == tion.READ_CHARACT {
+			if c.UUID().String() == strings.Replace(tion.READ_CHARACT, "-", "", -1) {
 				n.rc = c
 			}
 		}
 	}
+
+	if n.wc == nil {
+		n.cnct <- errors.New("Unable to find write characteristic.")
+	}
+	if n.rc == nil {
+		n.cnct <- errors.New("Unable to find read characteristic.")
+	}
+
 	n.cnct <- nil
 }
 
