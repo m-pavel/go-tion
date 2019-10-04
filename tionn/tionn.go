@@ -12,22 +12,39 @@ import (
 )
 
 type nativeTion struct {
-	addr string
-	cnct chan error
+	addr   string
+	p      gatt.Peripheral
+	rc, wc *gatt.Characteristic
+	cnct   chan error
+	debug  bool
 }
 
 func New(addr string, debug ...bool) tion.Tion {
 	nt := nativeTion{addr: addr}
 	nt.cnct = make(chan error)
+	if len(debug) > 0 {
+		nt.debug = debug[0]
+	}
 	return &nt
 }
 
 func (n *nativeTion) ReadState(timeout time.Duration) (*tion.Status, error) {
-	return nil, nil
+	if err := n.p.WriteCharacteristic(n.wc, tion.StatusRequest, true); err != nil {
+		return nil, err
+	}
+	time.Sleep(2 * time.Second)
+	resp, err := n.p.ReadCharacteristic(n.rc)
+	if err != nil {
+		return nil, err
+	}
+	if n.debug {
+		log.Printf("RSP [%d]: %v\n", n, resp)
+	}
+	return tion.FromBytes(resp)
 }
 
 func (n *nativeTion) Update(s *tion.Status, timeout time.Duration) error {
-	return nil
+	return errors.New("not implemented")
 }
 
 func (n *nativeTion) Connect(timeout time.Duration) error {
@@ -66,10 +83,34 @@ func (n *nativeTion) onPeriphDiscovered(p gatt.Peripheral, a *gatt.Advertisement
 }
 
 func (n *nativeTion) onPeriphConnected(p gatt.Peripheral, err error) {
-	n.cnct <- err
+	if err != nil {
+		n.cnct <- err
+	}
+	n.p = p
+
+	services, err := p.DiscoverServices(nil)
+	if err != nil {
+		n.cnct <- err
+	}
+
+	for _, service := range services {
+		cs, _ := p.DiscoverCharacteristics(nil, service)
+
+		for _, c := range cs {
+			log.Printf("%v %v\n", service.UUID().String(), c.UUID().String())
+			if c.UUID().String() == tion.WRITE_CHARACT {
+				n.wc = c
+			}
+			if c.UUID().String() == tion.READ_CHARACT {
+				n.rc = c
+			}
+		}
+	}
+	n.cnct <- nil
 }
 
 func (n *nativeTion) onPeriphDisconnected(p gatt.Peripheral, err error) {
+	n.p = nil
 	n.cnct <- err
 }
 func onStateChanged(d gatt.Device, s gatt.State) {
@@ -84,5 +125,8 @@ func onStateChanged(d gatt.Device, s gatt.State) {
 }
 
 func (n *nativeTion) Disconnect() error {
+	if n.p != nil {
+		// TODO
+	}
 	return nil
 }

@@ -11,11 +11,6 @@ import (
 	tion2 "github.com/m-pavel/go-tion/tion"
 )
 
-const (
-	wchar = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
-	rchar = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
-)
-
 type tion struct {
 	g     *gattlib.Gatt
 	Addr  string
@@ -80,11 +75,11 @@ func (t *tion) rw() (*tion2.Status, error) {
 	if !t.g.Connected() {
 		return nil, errors.New("Not connected")
 	}
-	if err := t.g.Write(wchar, tion2.StatusRequest); err != nil {
+	if err := t.g.Write(tion2.WRITE_CHARACT, tion2.StatusRequest); err != nil {
 		return nil, err
 	}
 	time.Sleep(2 * time.Second)
-	resp, n, err := t.g.Read(rchar)
+	resp, n, err := t.g.Read(tion2.READ_CHARACT)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +100,7 @@ func (t *tion) Update(s *tion2.Status, timeout time.Duration) error {
 	c1 := make(chan error, 1)
 
 	go func() {
-		c1 <- t.g.Write(wchar, tion2.FromStatus(s))
+		c1 <- t.g.Write(tion2.WRITE_CHARACT, tion2.FromStatus(s))
 	}()
 
 	select {
