@@ -75,7 +75,7 @@ func (n *nativeTion) onPeriphDisconnected(p gatt.Peripheral, err error) {
 func onStateChanged(d gatt.Device, s gatt.State) {
 	switch s {
 	case gatt.StatePoweredOn:
-		log.Printf("scanning...")
+		log.Printf("Scanning...")
 		d.Scan([]gatt.UUID{}, false)
 		return
 	default:
