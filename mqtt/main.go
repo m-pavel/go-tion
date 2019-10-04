@@ -7,11 +7,15 @@ import (
 	_ "net/http"
 	_ "net/http/pprof"
 
+	"time"
+
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/m-pavel/go-hassio-mqtt/pkg"
 	"github.com/m-pavel/go-tion/gatt"
 	"github.com/m-pavel/go-tion/tion"
 )
+
+const timeout = 7 * time.Second
 
 type Request struct {
 	Gate          string `json:"gate"`
@@ -58,9 +62,9 @@ func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, de
 }
 
 func (ts TionService) Do() (interface{}, error) {
-	ts.t.Connect()
+	ts.t.Connect(timeout)
 	defer ts.t.Disconnect()
-	s, err := ts.t.ReadState(7)
+	s, err := ts.t.ReadState(timeout)
 	if err != nil {
 		return nil, err
 	}
@@ -92,9 +96,9 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		log.Println(req)
 	}
 
-	ts.t.Connect()
+	ts.t.Connect(timeout)
 	defer ts.t.Disconnect()
-	cs, err := ts.t.ReadState(7)
+	cs, err := ts.t.ReadState(timeout)
 	if err != nil {
 		log.Println(err)
 		return
@@ -102,7 +106,7 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 
 	if req.Speed != nil && *req.Speed != cs.Speed {
 		cs.Speed = *req.Speed
-		err = ts.t.Update(cs, 7)
+		err = ts.t.Update(cs, timeout)
 		if err != nil {
 			log.Println(err)
 		} else {

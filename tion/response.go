@@ -8,6 +8,7 @@ import (
 	"github.com/go-errors/errors"
 )
 
+// Status of the breezer
 type Status struct {
 	Enabled         bool
 	HeaterEnabled   bool
@@ -72,7 +73,7 @@ func sts(b bool) string {
 
 func FromBytes(bytes []byte) (*Status, error) {
 	if len(bytes) < 20 {
-		return nil, errors.New("Expecting 20 bytes array")
+		return nil, errors.New(fmt.Sprintf("Expecting 20 bytes array. Got %d", len(bytes)))
 	}
 	buffer := bytes2.NewBuffer(bytes[2:])
 
