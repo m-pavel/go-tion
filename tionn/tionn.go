@@ -11,10 +11,13 @@ import (
 
 type nativeTion struct {
 	addr string
+	cnct chan error
 }
 
 func New(addr string, debug ...bool) tion.Tion {
-	return &nativeTion{addr: addr}
+	nt := nativeTion{addr: addr}
+	nt.cnct = make(chan error)
+	return &nt
 }
 
 func (n *nativeTion) ReadState(timeout int) (*tion.Status, error) {
@@ -41,7 +44,10 @@ func (n *nativeTion) Connect() error {
 		gatt.PeripheralConnected(n.onPeriphConnected),
 		gatt.PeripheralDisconnected(n.onPeriphDisconnected),
 	)
-	return d.Init(onStateChanged)
+	if err = d.Init(onStateChanged); err != nil {
+		return err
+	}
+	return <-n.cnct
 }
 
 func (n *nativeTion) onPeriphDiscovered(p gatt.Peripheral, a *gatt.Advertisement, rssi int) {
@@ -53,10 +59,10 @@ func (n *nativeTion) onPeriphDiscovered(p gatt.Peripheral, a *gatt.Advertisement
 	}
 }
 func (n *nativeTion) onPeriphConnected(p gatt.Peripheral, err error) {
-
+	n.cnct <- err
 }
 func (n *nativeTion) onPeriphDisconnected(p gatt.Peripheral, err error) {
-
+	n.cnct <- err
 }
 func onStateChanged(d gatt.Device, s gatt.State) {
 	log.Printf("State:", s)
