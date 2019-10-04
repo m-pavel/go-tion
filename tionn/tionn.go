@@ -51,8 +51,10 @@ func (n *nativeTion) Connect() error {
 }
 
 func (n *nativeTion) onPeriphDiscovered(p gatt.Peripheral, a *gatt.Advertisement, rssi int) {
+	fmt.Println(a.LocalName)
 	fmt.Println(p)
 	fmt.Println(a)
+
 	if a.LocalName == "" {
 		p.Device().StopScanning()
 		p.Device().Connect(p)
