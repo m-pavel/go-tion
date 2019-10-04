@@ -55,7 +55,7 @@ func (n *nativeTion) onPeriphDiscovered(p gatt.Peripheral, a *gatt.Advertisement
 	fmt.Println(p)
 	fmt.Println(a)
 
-	if a.LocalName == "" {
+	if a.LocalName == "AAA" {
 		p.Device().StopScanning()
 		p.Device().Connect(p)
 	}
