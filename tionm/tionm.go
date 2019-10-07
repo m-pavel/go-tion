@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	"log"
+
 	"github.com/m-pavel/go-tion/tion"
 	"github.com/muka/go-bluetooth/api"
 	"github.com/muka/go-bluetooth/bluez/profile/device"
@@ -56,12 +58,12 @@ func (n *mTion) Connect(timeout time.Duration) error {
 	if err != nil {
 		return err
 	}
-
+	log.Println("Got adapter")
 	n.d, err = ad.GetDeviceByAddress(n.addr)
 	if err != nil {
 		return err
 	}
-
+	log.Println("Got device")
 	return n.d.Connect()
 }
 
