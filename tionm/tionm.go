@@ -33,15 +33,17 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Println("Got write char")
 	if err := wc.WriteValue(tion.StatusRequest, nil); err != nil {
 		return nil, err
 	}
-
+	log.Println("Written")
 	time.Sleep(1 * time.Second)
 	rc, err := n.d.GetCharByUUID(tion.READ_CHARACT)
 	if err != nil {
 		return nil, err
 	}
+	log.Println("Got read char")
 	if data, err := rc.ReadValue(nil); err != nil {
 		return nil, err
 	} else {
