@@ -71,7 +71,7 @@ func (n *mTion) Connect(timeout time.Duration) error {
 	if err = n.d.Connect(); err != nil {
 		return err
 	}
-	n.d.GetCharByUUID()
+	return nil
 }
 
 func (n *mTion) Disconnect() error {
