@@ -116,5 +116,5 @@ func rb(b *bytes2.Buffer) int8 {
 }
 
 func ri(b *bytes2.Buffer) int {
-	return int(rb(b) + rb(b)<<8)
+	return int(rb(b)) + int(rb(b))<<8
 }
