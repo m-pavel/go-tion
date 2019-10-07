@@ -78,12 +78,10 @@ func (n *mTion) Connect(timeout time.Duration) error {
 	if err != nil {
 		return err
 	}
-	log.Println("Got adapter")
 	n.d, err = ad.GetDeviceByAddress(n.addr)
 	if err != nil {
 		return err
 	}
-	log.Println("Got device")
 	if err = n.d.Connect(); err != nil {
 		return err
 	}

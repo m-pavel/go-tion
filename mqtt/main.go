@@ -150,7 +150,7 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 }
 
 func (ts TionService) Close() error {
-	return nil
+	return ts.t.Disconnect()
 }
 
 func main() {
