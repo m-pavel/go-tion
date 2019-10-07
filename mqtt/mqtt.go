@@ -63,7 +63,9 @@ func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, de
 }
 
 func (ts TionService) Do() (interface{}, error) {
-	ts.t.Connect(timeout)
+	if err := ts.t.Connect(timeout); err != nil {
+		return nil, err
+	}
 	defer ts.t.Disconnect()
 	s, err := ts.t.ReadState(timeout)
 	if err != nil {
