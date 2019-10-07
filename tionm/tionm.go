@@ -89,11 +89,9 @@ func (n *mTion) Connect(timeout time.Duration) error {
 		return err
 	}
 	time.Sleep(time.Second)
-	cr, err := n.d.GetDescriptorList()
-	if err != nil {
+	if _, err := n.d.GetDescriptorList(); err != nil {
 		return err
 	}
-	log.Println(cr)
 	return nil
 }
 
