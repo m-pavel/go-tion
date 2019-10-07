@@ -6,6 +6,8 @@ import (
 
 	"log"
 
+	"fmt"
+
 	"github.com/m-pavel/go-tion/tion"
 	"github.com/muka/go-bluetooth/api"
 	"github.com/muka/go-bluetooth/bluez/profile/device"
@@ -67,7 +69,7 @@ func (n *mTion) Update(s *tion.Status, timeout time.Duration) error {
 	case res := <-c1:
 		return res
 	case <-time.After(timeout):
-		return errors.New("Write timeout")
+		return errors.New(fmt.Sprintf("Write timeout %d", timeout))
 	}
 }
 
