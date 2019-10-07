@@ -38,7 +38,7 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 		return nil, err
 	}
 	log.Println("Written")
-	time.Sleep(1 * time.Second)
+	time.Sleep(200 * time.Millisecond)
 	rc, err := n.d.GetCharByUUID(tion.READ_CHARACT)
 	if err != nil {
 		return nil, err
