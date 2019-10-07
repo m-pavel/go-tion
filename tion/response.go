@@ -57,7 +57,7 @@ func (s *Status) SetGateStatus(str string) {
 }
 
 func (s Status) BeautyString() string {
-	return fmt.Sprintf("Status: %s, Heater: %s, Sound: %s\nTarget: %d C, In: %d C, Out: %d C\nSpeed %d, Gate: %s, Error: %d\nFilters %d,Uptime %d days %d:%d\n",
+	return fmt.Sprintf("Status: %s, Heater: %s, Sound: %s\nTarget: %d C, In: %d C, Out: %d C\nSpeed %d, Gate: %s, Error: %d\nFilters: %d days, Uptime %d days %2d:%2d\n",
 		sts(s.Enabled), sts(s.HeaterEnabled), sts(s.SoundEnabled),
 		s.TempTarget, s.TempIn, s.TempOut,
 		s.Speed, s.GateStatus(), s.ErrorCode,
