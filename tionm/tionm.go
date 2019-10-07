@@ -33,14 +33,17 @@ func New(addr string, debug ...bool) tion.Tion {
 func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 	wc, err := n.d.GetCharByUUID(tion.WRITE_CHARACT)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	if err := wc.WriteValue(tion.StatusRequest, nil); err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	time.Sleep(200 * time.Millisecond)
 	rc, err := n.d.GetCharByUUID(tion.READ_CHARACT)
 	if err != nil {
+		log.Println(err)
 		return nil, err
 	}
 	if data, err := rc.ReadValue(nil); err != nil {
