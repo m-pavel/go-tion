@@ -45,8 +45,10 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 	}
 	log.Println("Got read char")
 	if data, err := rc.ReadValue(nil); err != nil {
+		log.Println(err)
 		return nil, err
 	} else {
+		log.Println("REad")
 		return tion.FromBytes(data)
 	}
 }
