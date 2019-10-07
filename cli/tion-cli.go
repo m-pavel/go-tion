@@ -113,7 +113,6 @@ func main() {
 		}
 		defer t.Disconnect()
 		state, err := t.ReadState(timeout)
-		time.Sleep(90 * time.Second)
 		if err != nil {
 			log.Println(err)
 			return
