@@ -128,7 +128,10 @@ func (n *nativeTion) onPeriphConnected(p gatt.Peripheral, err error) {
 		n.cnct <- err
 	}
 
-	p.SetNotifyValue(n.rc, n.reqdNotification)
+	if err := p.SetNotifyValue(n.rc, n.reqdNotification); err != nil {
+		n.cnct <- err
+	}
+	log.Println("Subscribed")
 	n.cnct <- nil
 }
 
