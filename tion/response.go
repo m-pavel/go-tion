@@ -115,6 +115,10 @@ func rb(b *bytes2.Buffer) int8 {
 	return int8(bt & 0xFF)
 }
 
+func rub(b *bytes2.Buffer) int {
+	bt, _ := b.ReadByte()
+	return int(bt)
+}
 func ri(b *bytes2.Buffer) int {
-	return int(rb(b)) + int(rb(b))<<8
+	return rub(b) + rub(b)<<8
 }
