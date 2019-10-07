@@ -88,6 +88,11 @@ func (n *mTion) Connect(timeout time.Duration) error {
 	if err = n.d.Connect(); err != nil {
 		return err
 	}
+	cr, err := n.d.GetCharacteristics()
+	if err != nil {
+		return err
+	}
+	log.Println(cr)
 	return nil
 }
 
