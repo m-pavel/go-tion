@@ -11,8 +11,9 @@ import (
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/m-pavel/go-hassio-mqtt/pkg"
-	"github.com/m-pavel/go-tion/gatt"
+
 	"github.com/m-pavel/go-tion/tion"
+	"github.com/m-pavel/go-tion/tionm"
 )
 
 const timeout = 7 * time.Second
@@ -48,7 +49,7 @@ func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, de
 		log.Println("Using fake device.")
 		ts.t = tion.NewFake()
 	} else {
-		ts.t = gatt.New(*ts.bt, debug)
+		ts.t = tionm.New(*ts.bt, debug)
 	}
 
 	ts.debug = debug

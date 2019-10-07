@@ -33,28 +33,42 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Println("Got write char")
 	if err := wc.WriteValue(tion.StatusRequest, nil); err != nil {
 		return nil, err
 	}
-	log.Println("Written")
 	time.Sleep(200 * time.Millisecond)
 	rc, err := n.d.GetCharByUUID(tion.READ_CHARACT)
 	if err != nil {
 		return nil, err
 	}
-	log.Println("Got read char")
 	if data, err := rc.ReadValue(nil); err != nil {
 		log.Println(err)
 		return nil, err
 	} else {
-		log.Printf("Read %v\n", data)
+		if n.debug {
+			log.Printf("RSP [%d]: %v\n", n, data)
+		}
 		return tion.FromBytes(data)
 	}
 }
 
 func (n *mTion) Update(s *tion.Status, timeout time.Duration) error {
-	return errors.New("not implemented")
+	wc, err := n.d.GetCharByUUID(tion.WRITE_CHARACT)
+	if err != nil {
+		return err
+	}
+
+	c1 := make(chan error, 1)
+	go func() {
+		c1 <- wc.WriteValue(tion.FromStatus(s), nil)
+	}()
+
+	select {
+	case res := <-c1:
+		return res
+	case <-time.After(timeout):
+		return errors.New("Write timeout")
+	}
 }
 
 func (n *mTion) Connect(timeout time.Duration) error {

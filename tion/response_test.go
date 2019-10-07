@@ -1,6 +1,7 @@
 package tion
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -30,4 +31,15 @@ func Test02_Minus(t *testing.T) {
 	if resp.TempIn != -3 {
 		t.Fatal(resp.TempIn)
 	}
+}
+
+func TestInt(t *testing.T) {
+	bts := []byte{179, 16, 33, 0, 10, 0, 9, 8, 5, 107, 0, 11, 9, 0, 30, 215, 0, 50, 0, 90}
+	fmt.Println(bts)
+	resp, err := FromBytes(bts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(resp.BeautyString())
+	fmt.Println(resp.FirmwareVersion)
 }

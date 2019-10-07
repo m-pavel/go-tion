@@ -12,7 +12,8 @@ import (
 	"fmt"
 
 	"github.com/gorhill/cronexpr"
-	"github.com/m-pavel/go-tion/gatt"
+
+	"github.com/m-pavel/go-tion/tionm"
 	"github.com/sevlyar/go-daemon"
 )
 
@@ -234,7 +235,7 @@ func daemonf(device string, dao *Dao, repeat int) {
 }
 
 func execute(s Schedule, device string, retry int, interval time.Duration) error {
-	t := gatt.New(device)
+	t := tionm.New(device)
 	if err := t.Connect(timeout); err != nil {
 		return err
 	}
