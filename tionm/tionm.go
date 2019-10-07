@@ -36,7 +36,7 @@ func New(addr string, debug ...bool) tion.Tion {
 func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 	n.m.Lock()
 	defer n.m.Unlock()
-	if c, err := n.d.GetConnected(); err != nil {
+	if c, err := n.isConnected(); err != nil {
 		return nil, err
 	} else {
 		if !c {
@@ -72,7 +72,7 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 func (n *mTion) Update(s *tion.Status, timeout time.Duration) error {
 	n.m.Lock()
 	defer n.m.Unlock()
-	if c, err := n.d.GetConnected(); err != nil {
+	if c, err := n.isConnected(); err != nil {
 		return err
 	} else {
 		if !c {
@@ -100,7 +100,7 @@ func (n *mTion) Update(s *tion.Status, timeout time.Duration) error {
 func (n *mTion) Connect(timeout time.Duration) error {
 	n.m.Lock()
 	defer n.m.Unlock()
-	if c, err := n.d.GetConnected(); err != nil {
+	if c, err := n.isConnected(); err != nil {
 		return err
 	} else {
 		if c {
@@ -130,6 +130,13 @@ func (n *mTion) Connect(timeout time.Duration) error {
 		return err
 	}
 	return nil
+}
+func (n *mTion) isConnected() (bool, error) {
+	if n.d == nil || n.d.Client() == nil {
+		return false, nil
+	}
+
+	return n.d.GetConnected()
 }
 
 func (n *mTion) Disconnect() error {
