@@ -85,6 +85,13 @@ func (n *mTion) Connect(timeout time.Duration) error {
 	if err != nil {
 		return err
 	}
+	if p, err := n.d.GetPaired(); err != nil {
+		return err
+	} else {
+		if !p {
+			return errors.New(fmt.Sprintf("Device %s is not paired. Pair with bluetoothctrl.", n.addr))
+		}
+	}
 	if err = n.d.Connect(); err != nil {
 		return err
 	}
