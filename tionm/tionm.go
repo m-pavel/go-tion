@@ -48,7 +48,7 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 		log.Println(err)
 		return nil, err
 	} else {
-		log.Println("REad")
+		log.Printf("Read %v\n", data)
 		return tion.FromBytes(data)
 	}
 }
@@ -68,7 +68,10 @@ func (n *mTion) Connect(timeout time.Duration) error {
 		return err
 	}
 	log.Println("Got device")
-	return n.d.Connect()
+	if err = n.d.Connect(); err != nil {
+		return err
+	}
+	n.d.GetCharByUUID()
 }
 
 func (n *mTion) Disconnect() error {
