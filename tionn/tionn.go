@@ -35,21 +35,22 @@ func (n *nativeTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 		return nil, err
 	}
 	time.Sleep(2 * time.Second)
-	resp, err := n.p.ReadCharacteristic(n.rc)
-	if err != nil {
-		return nil, err
-	}
-	if n.debug {
-		log.Printf("RSP [%d]: %v\n", len(resp), resp)
-	}
-	resp, err = n.p.ReadCharacteristic(n.rc)
-	if err != nil {
-		return nil, err
-	}
-	if n.debug {
-		log.Printf("RSP [%d]: %v\n", len(resp), resp)
-	}
-	return tion.FromBytes(resp)
+	//resp, err := n.p.ReadCharacteristic(n.rc)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//if n.debug {
+	//	log.Printf("RSP [%d]: %v\n", len(resp), resp)
+	//}
+	//resp, err = n.p.ReadCharacteristic(n.rc)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//if n.debug {
+	//	log.Printf("RSP [%d]: %v\n", len(resp), resp)
+	//}
+	//return tion.FromBytes(resp)
+	return nil, errors.New("not implemented")
 }
 
 func (n *nativeTion) Update(s *tion.Status, timeout time.Duration) error {
@@ -123,7 +124,18 @@ func (n *nativeTion) onPeriphConnected(p gatt.Peripheral, err error) {
 		n.cnct <- errors.New("Unable to find read characteristic.")
 	}
 
+	if _, err := p.DiscoverDescriptors(nil, n.rc); err != nil {
+		n.cnct <- err
+	}
+
+	p.SetNotifyValue(n.rc, n.reqdNotification)
 	n.cnct <- nil
+}
+
+func (n *nativeTion) reqdNotification(c *gatt.Characteristic, data []byte, err error) {
+	log.Println("AAAA")
+	log.Println(err)
+	log.Println(data)
 }
 
 func (n *nativeTion) onPeriphDisconnected(p gatt.Peripheral, err error) {

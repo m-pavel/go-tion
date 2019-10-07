@@ -7,8 +7,8 @@ import (
 
 	"time"
 
+	"github.com/m-pavel/go-tion/gatt"
 	"github.com/m-pavel/go-tion/tion"
-	"github.com/m-pavel/go-tion/tionn"
 )
 
 const timeout = 7 * time.Second
@@ -106,7 +106,7 @@ func main() {
 	}
 
 	if *status {
-		t := tionn.New(*device, *debug)
+		t := newDevice(*device, *debug)
 		if err := t.Connect(timeout); err != nil {
 			log.Printf("Connect error: %v\n", err)
 			return
@@ -122,7 +122,7 @@ func main() {
 }
 
 func deviceCall(addr string, dbg bool, cb func(tion.Tion, *tion.Status) error, succ string) error {
-	t := tionn.New(addr, dbg)
+	t := newDevice(addr, dbg)
 	if err := t.Connect(timeout); err != nil {
 		return err
 	}
@@ -139,6 +139,10 @@ func deviceCall(addr string, dbg bool, cb func(tion.Tion, *tion.Status) error, s
 		log.Println(succ)
 	}
 	return err
+}
+
+func newDevice(addr string, dbg bool) tion.Tion {
+	return gatt.New(addr, dbg)
 }
 
 //func scan() {

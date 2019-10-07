@@ -21,6 +21,7 @@ var (
 	done = make(chan struct{})
 )
 
+const timeout = 7 * time.Second
 const status = "%2d | %20s | %7s | %6s | %5s | %4s | %5s | %4s | %s |\n"
 const statush = "ID |       SCHEDULE       | ENABLED | HEATER | SOUND | TEMP | SPEED | GATE |         NEXT RUN         |\n"
 
@@ -234,11 +235,11 @@ func daemonf(device string, dao *Dao, repeat int) {
 
 func execute(s Schedule, device string, retry int, interval time.Duration) error {
 	t := gatt.New(device)
-	if err := t.Connect(); err != nil {
+	if err := t.Connect(timeout); err != nil {
 		return err
 	}
 	defer t.Disconnect()
-	ts, err := t.ReadState(7)
+	ts, err := t.ReadState(timeout)
 	if err != nil {
 		return err
 	}
@@ -265,7 +266,7 @@ func execute(s Schedule, device string, retry int, interval time.Duration) error
 
 	i := 0
 	for ; i < retry; i++ {
-		err = t.Update(ts, 7)
+		err = t.Update(ts, timeout)
 		if err == nil {
 			break
 		}
