@@ -97,7 +97,10 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		log.Println(req)
 	}
 
-	ts.t.Connect(timeout)
+	if err := ts.t.Connect(timeout); err != nil {
+		log.Println(err)
+		return
+	}
 	defer ts.t.Disconnect()
 	cs, err := ts.t.ReadState(timeout)
 	if err != nil {
