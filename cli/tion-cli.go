@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/m-pavel/go-tion/tion"
-	"github.com/m-pavel/go-tion/tionn"
+	"github.com/m-pavel/go-tion/tionm"
 )
 
 const timeout = 7 * time.Second
@@ -144,7 +144,7 @@ func deviceCall(addr string, dbg bool, cb func(tion.Tion, *tion.Status) error, s
 }
 
 func newDevice(addr string, dbg bool) tion.Tion {
-	return tionn.New(addr, dbg)
+	return tionm.New(addr, dbg)
 }
 
 //func scan() {
