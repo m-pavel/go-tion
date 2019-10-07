@@ -118,6 +118,7 @@ func main() {
 			return
 		}
 		log.Println(state.BeautyString())
+		time.Sleep(10 * time.Second)
 	}
 }
 
