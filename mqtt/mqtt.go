@@ -18,18 +18,6 @@ import (
 
 const timeout = 7 * time.Second
 
-type Request struct {
-	Gate          string `json:"gate"`
-	On            *bool  `json:"on"`
-	Heater        bool   `json:"heater"`
-	Sound         bool   `json:"sound"`
-	Out           int8   `json:"temp_out"`
-	In            int8   `json:"temp_in"`
-	Target        int8   `json:"temp_target"`
-	Speed         *int8  `json:"speed"`
-	FilterRemains int    `json:"filters"`
-}
-
 type TionService struct {
 	t      tion.Tion
 	bt     *string
@@ -95,21 +83,11 @@ func (ts TionService) Do() (interface{}, error) {
 	if ts.debug {
 		log.Println(s.BeautyString())
 	}
-	return &Request{
-		Gate:          s.GateStatus(),
-		On:            &s.Enabled,
-		Heater:        s.HeaterEnabled,
-		Out:           s.TempOut,
-		In:            s.TempIn,
-		Target:        s.TempTarget,
-		Speed:         &s.Speed,
-		Sound:         s.SoundEnabled,
-		FilterRemains: s.FiltersRemains,
-	}, nil
+	return tion.RestFromStatus(s), nil
 }
 
 func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
-	req := Request{}
+	req := tion.RestStatus{}
 	err := json.Unmarshal(msg.Payload(), &req)
 	if err != nil {
 		log.Println(err)

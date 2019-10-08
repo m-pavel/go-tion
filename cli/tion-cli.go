@@ -7,17 +7,37 @@ import (
 
 	"time"
 
+	"github.com/m-pavel/go-tion/mqttcli"
 	"github.com/m-pavel/go-tion/tion"
 	"github.com/m-pavel/go-tion/tionm"
 )
 
-const timeout = 7 * time.Second
+type cliDevice struct {
+	device    *string
+	mqtt      *string
+	mqtt_user *string
+	mqtt_pass *string
+	mqtt_ca   *string
+	mqtt_t    *string
+	mqtt_ta   *string
+	mqtt_tc   *string
+	debug     *bool
+	timeout   time.Duration
+}
 
 func main() {
-	var device = flag.String("device", "", "bt addr")
+	device := cliDevice{}
+	device.device = flag.String("device", "", "bt addr")
+	device.mqtt = flag.String("mqtt", "", "MQTT addr")
+	device.mqtt_user = flag.String("mqtt-u", "", "MQTT user")
+	device.mqtt_pass = flag.String("mqtt-p", "", "MQTT password")
+	device.mqtt_ca = flag.String("mqtt-ca", "", "MQTT ca")
+	device.mqtt_t = flag.String("mqtt-t", "", "MQTT status topic")
+	device.mqtt_ta = flag.String("mqtt-ta", "", "MQTT availability topic")
+	device.mqtt_tc = flag.String("mqtt-tc", "", "MQTT control topic")
 	var status = flag.Bool("status", true, "Request status")
 	var scanp = flag.Bool("scan", false, "Perform scan")
-	var debug = flag.Bool("debug", false, "Debug")
+	device.debug = flag.Bool("debug", false, "Debug")
 	var on = flag.Bool("on", false, "Turn on")
 	var off = flag.Bool("off", false, "Turn off")
 	var temp = flag.Int("temp", 0, "Set target temperature")
@@ -25,32 +45,34 @@ func main() {
 	var sound = flag.String("sound", "", "Sound on|off")
 	var heater = flag.String("heater", "", "Heater on|off")
 	var gate = flag.String("gate", "", "Set gate position(indoor|outdoor|mixed)")
+	var timeoutp = flag.Int("timeout", 7, "Timeout seconds")
 	flag.Parse()
 	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
 
-	if *device == "" && !*scanp {
-		log.Fatal("Device address is mandatory")
+	device.timeout = time.Duration(*timeoutp) * time.Second
+	if *device.device == "" && !*scanp && *device.mqtt == "" {
+		log.Fatal("Device address or MQTT is mandatory")
 	}
 
 	if *on {
-		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
+		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
 			s.Enabled = true
-			return t.Update(s, timeout)
+			return t.Update(s, device.timeout)
 		}, "Turned on")
 
 		return
 	}
 	if *off {
-		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
+		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
 			s.Enabled = false
-			return t.Update(s, timeout)
+			return t.Update(s, device.timeout)
 		}, "Turned off")
 		return
 	}
 	if *temp != 0 {
-		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
+		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
 			s.TempTarget = int8(*temp)
-			return t.Update(s, timeout)
+			return t.Update(s, device.timeout)
 		}, fmt.Sprintf("Target temperature updated to %d", *temp))
 		return
 	}
@@ -60,41 +82,41 @@ func main() {
 			log.Println("Speed range 1..6")
 			return
 		}
-		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
+		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
 			s.Speed = int8(*speed)
-			return t.Update(s, timeout)
+			return t.Update(s, device.timeout)
 		}, fmt.Sprintf("Speed updated to %d", *speed))
 		return
 	}
 
 	if *gate != "" {
-		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
+		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
 			s.SetGateStatus(*gate)
-			return t.Update(s, timeout)
+			return t.Update(s, device.timeout)
 		}, fmt.Sprintf("Gate set to %s", *gate))
 		return
 	}
 
 	if *sound != "" {
-		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
+		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
 			if *sound == "on" {
 				s.SoundEnabled = true
 			} else {
 				s.SoundEnabled = false
 			}
-			return t.Update(s, timeout)
+			return t.Update(s, device.timeout)
 		}, fmt.Sprintf("Sound set to %s", *sound))
 		return
 	}
 
 	if *heater != "" {
-		deviceCall(*device, *debug, func(t tion.Tion, s *tion.Status) error {
+		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
 			if *heater == "on" {
 				s.HeaterEnabled = true
 			} else {
 				s.HeaterEnabled = false
 			}
-			return t.Update(s, timeout)
+			return t.Update(s, device.timeout)
 		}, fmt.Sprintf("Heater set to %s", *heater))
 		return
 	}
@@ -106,13 +128,13 @@ func main() {
 	}
 
 	if *status {
-		t := newDevice(*device, *debug)
-		if err := t.Connect(timeout); err != nil {
+		t := newDevice(&device)
+		if err := t.Connect(device.timeout); err != nil {
 			log.Printf("Connect error: %v\n", err)
 			return
 		}
 		defer t.Disconnect()
-		state, err := t.ReadState(timeout)
+		state, err := t.ReadState(device.timeout)
 		if err != nil {
 			log.Println(err)
 			return
@@ -122,13 +144,13 @@ func main() {
 	}
 }
 
-func deviceCall(addr string, dbg bool, cb func(tion.Tion, *tion.Status) error, succ string) error {
-	t := newDevice(addr, dbg)
-	if err := t.Connect(timeout); err != nil {
+func deviceCall(device *cliDevice, cb func(tion.Tion, *tion.Status) error, succ string) error {
+	t := newDevice(device)
+	if err := t.Connect(device.timeout); err != nil {
 		return err
 	}
 	defer t.Disconnect()
-	s, err := t.ReadState(timeout)
+	s, err := t.ReadState(device.timeout)
 	if err != nil {
 		return err
 	}
@@ -142,8 +164,15 @@ func deviceCall(addr string, dbg bool, cb func(tion.Tion, *tion.Status) error, s
 	return err
 }
 
-func newDevice(addr string, dbg bool) tion.Tion {
-	return tionm.New(addr, dbg)
+func newDevice(device *cliDevice) tion.Tion {
+	if *device.device != "" {
+		return tionm.New(*device.device, *device.debug)
+	}
+	if *device.mqtt != "" {
+		return mqttcli.New(*device.mqtt, *device.mqtt_user, *device.mqtt_pass, *device.mqtt_ca, *device.mqtt_t, *device.mqtt_ta, *device.mqtt_tc, *device.debug)
+	}
+	log.Panic("Unable to create device")
+	return nil
 }
 
 //func scan() {
