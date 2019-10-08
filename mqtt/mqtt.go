@@ -31,16 +31,19 @@ type Request struct {
 }
 
 type TionService struct {
-	t     tion.Tion
-	bt    *string
-	debug bool
-	fake  *bool
-	ss    ghm.SendState
+	t      tion.Tion
+	bt     *string
+	debug  bool
+	fake   *bool
+	keepbt *bool
+	ss     ghm.SendState
 }
 
 func (ts *TionService) PrepareCommandLineParams() {
 	ts.bt = flag.String("device", "xx:yy:zz:aa:bb:cc", "Device BT address")
 	ts.fake = flag.Bool("fake", false, "Fake device")
+	ts.keepbt = flag.Bool("keepbt", false, "Keep bluetooth connection")
+
 }
 func (ts TionService) Name() string { return "tion" }
 
@@ -59,14 +62,31 @@ func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, de
 		return token.Error()
 	}
 
+	if *ts.keepbt {
+		return ts.t.Connect(timeout)
+	}
 	return nil
+}
+func (ts *TionService) cm_start() error {
+	if *ts.keepbt {
+		return nil
+	} else {
+		return ts.t.Connect(timeout)
+	}
+}
+func (ts *TionService) cm_end() error {
+	if *ts.keepbt {
+		return nil
+	} else {
+		return ts.t.Disconnect()
+	}
 }
 
 func (ts TionService) Do() (interface{}, error) {
-	if err := ts.t.Connect(timeout); err != nil {
+	if err := ts.cm_start(); err != nil {
 		return nil, err
 	}
-	defer ts.t.Disconnect()
+	defer ts.cm_end()
 	s, err := ts.t.ReadState(timeout)
 	if err != nil {
 		return nil, err
@@ -99,11 +119,12 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		log.Println(req)
 	}
 
-	if err := ts.t.Connect(timeout); err != nil {
+	if err := ts.cm_start(); err != nil {
 		log.Println(err)
 		return
 	}
-	defer ts.t.Disconnect()
+	defer ts.cm_end()
+
 	cs, err := ts.t.ReadState(timeout)
 	if err != nil {
 		log.Println(err)

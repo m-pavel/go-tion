@@ -146,6 +146,13 @@ func (n *mTion) Disconnect() error {
 		defer func() {
 			n.d = nil
 		}()
+		if c, err := n.isConnected(); err != nil {
+			return err
+		} else {
+			if !c {
+				return nil
+			}
+		}
 		return n.d.Disconnect()
 	}
 	return nil
