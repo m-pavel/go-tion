@@ -11,10 +11,10 @@ func NewFake() Tion {
 	return &fakeTion{}
 }
 
-func (t fakeTion) Connect(time.Duration) error {
+func (ft fakeTion) Connect(time.Duration) error {
 	return nil
 }
-func (t fakeTion) Disconnect() error {
+func (ft fakeTion) Disconnect() error {
 	return nil
 }
 func (ft fakeTion) ReadState(time.Duration) (*Status, error) {

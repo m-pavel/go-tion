@@ -28,14 +28,18 @@ type TionService struct {
 	ss     ghm.SendState
 }
 
+// PrepareCommandLineParams for TionService
 func (ts *TionService) PrepareCommandLineParams() {
 	ts.bt = flag.String("device", "xx:yy:zz:aa:bb:cc", "Device BT address")
 	ts.fake = flag.Bool("fake", false, "Fake device")
 	ts.keepbt = flag.Bool("keepbt", false, "Keep bluetooth connection")
 
 }
+
+// Name of TionService
 func (ts TionService) Name() string { return "tion" }
 
+// Init TionService
 func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, debug bool, ss ghm.SendState) error {
 	if *ts.fake {
 		log.Println("Using fake device.")
@@ -59,18 +63,17 @@ func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, de
 func (ts *TionService) cmStart() error {
 	if *ts.keepbt {
 		return nil
-	} else {
-		return ts.t.Connect(timeout)
 	}
+	return ts.t.Connect(timeout)
 }
 func (ts *TionService) cmEnd() error {
 	if *ts.keepbt {
 		return nil
-	} else {
-		return ts.t.Disconnect()
 	}
+	return ts.t.Disconnect()
 }
 
+// Do TionService
 func (ts TionService) Do() (interface{}, error) {
 	if err := ts.cmStart(); err != nil {
 		return nil, err
@@ -154,6 +157,7 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 	log.Println("Control done.")
 }
 
+// Close TionService
 func (ts TionService) Close() error {
 	return ts.t.Disconnect()
 }

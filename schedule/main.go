@@ -106,26 +106,26 @@ func main() {
 
 	if *schedule != "" {
 		var enb, htr, snd *bool
-		var true_, false_ bool
-		true_ = true
-		false_ = false
+		var trueAddr, falseAddr bool
+		trueAddr = true
+		falseAddr = false
 		if *heater == "on" {
-			htr = &true_
+			htr = &trueAddr
 		}
 		if *heater == "off" {
-			htr = &false_
+			htr = &falseAddr
 		}
 		if *sound == "on" {
-			snd = &true_
+			snd = &trueAddr
 		}
 		if *sound == "off" {
-			snd = &false_
+			snd = &falseAddr
 		}
 		if *on {
-			enb = &true_
+			enb = &trueAddr
 		}
 		if *off {
-			enb = &false_
+			enb = &falseAddr
 		}
 		var gt *int
 		if *gate != "" {

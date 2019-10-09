@@ -7,12 +7,14 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// Dao of the scheduler
 type Dao struct {
 	db *sql.DB
 }
 
+// Schedule table
 type Schedule struct {
-	Id      int
+	ID      int
 	Value   string
 	Enabled *bool
 	Heater  *bool
@@ -22,6 +24,7 @@ type Schedule struct {
 	Temp    *int
 }
 
+// New Dao
 func New(db string) (*Dao, error) {
 	dao := Dao{}
 	var err error
@@ -32,11 +35,13 @@ func New(db string) (*Dao, error) {
 	return &dao, nil
 }
 
+// Prepare table
 func (d *Dao) Prepare() error {
 	_, err := d.db.Exec("CREATE TABLE SCHEDULES (SCHEDULE text NOT NULL, ENABLED int, HEATER int, SOUND int, GATE int, SPEED int, TEMP int)")
 	return err
 }
 
+// Close dao
 func (d *Dao) Close() {
 	if d.db != nil {
 		d.db.Close()
@@ -44,6 +49,7 @@ func (d *Dao) Close() {
 	}
 }
 
+// GetSchedules from DB
 func (d *Dao) GetSchedules() ([]Schedule, error) {
 	stmt, err := d.db.Prepare("SELECT ROWID, SCHEDULE, ENABLED, HEATER, SOUND, GATE, SPEED, TEMP FROM SCHEDULES")
 	if err != nil {
@@ -61,7 +67,7 @@ func (d *Dao) GetSchedules() ([]Schedule, error) {
 			break
 		}
 		var s Schedule
-		rows.Scan(&s.Id, &s.Value, &s.Enabled, &s.Heater, &s.Sound, &s.Gate, &s.Speed, &s.Temp)
+		rows.Scan(&s.ID, &s.Value, &s.Enabled, &s.Heater, &s.Sound, &s.Gate, &s.Speed, &s.Temp)
 		if err != nil {
 			return nil, err
 		}
@@ -70,6 +76,7 @@ func (d *Dao) GetSchedules() ([]Schedule, error) {
 	return sch, err
 }
 
+// Add schedule
 func (d *Dao) Add(schedule string, enabled *bool, heater *bool, sound *bool, gate *int, speed *int, temp *int) error {
 	_, err := cronexpr.Parse(schedule)
 	if err != nil {
@@ -80,11 +87,13 @@ func (d *Dao) Add(schedule string, enabled *bool, heater *bool, sound *bool, gat
 	return err
 }
 
+// Delete entry
 func (d *Dao) Delete(id int) error {
 	_, err := d.db.Exec("DELETE FROM SCHEDULES WHERE ROWID=?", id)
 	return err
 }
 
+// UpdateHeater heater mode
 func (d *Dao) UpdateHeater(heater bool) error {
 	_, err := d.db.Exec("UPDATE SCHEDULES SET HEATER=?", heater)
 	return err
