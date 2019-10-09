@@ -12,6 +12,12 @@ type RestStatus struct {
 	Speed         *int8  `json:"speed"`
 	FilterRemains int    `json:"filters"`
 	Firmware      int    `json:"firmware"`
+
+	Hours        int8 `json:"run_hours"`
+	Minutes      int8 `json:"run_minutes"`
+	ErrorCode    int8 `json:"error"`
+	Productivity int8 `json:"productivity"`
+	RunDays      int  `json:"run_days"`
 }
 
 // RestFromStatus to RestStatus
@@ -27,6 +33,11 @@ func RestFromStatus(s *Status) *RestStatus {
 		Sound:         s.SoundEnabled,
 		FilterRemains: s.FiltersRemains,
 		Firmware:      s.FirmwareVersion,
+		Hours:         s.Hours,
+		Minutes:       s.Minutes,
+		RunDays:       s.RunDays,
+		Productivity:  s.Productivity,
+		ErrorCode:     s.ErrorCode,
 	}
 }
 
@@ -47,5 +58,10 @@ func StatusFromRest(rs *RestStatus) *Status {
 	s.SoundEnabled = rs.Sound
 	s.FiltersRemains = rs.FilterRemains
 	s.FirmwareVersion = rs.Firmware
+	s.ErrorCode = rs.ErrorCode
+	s.RunDays = rs.RunDays
+	s.Hours = rs.Hours
+	s.Minutes = rs.Minutes
+	s.Productivity = rs.Productivity
 	return &s
 }
