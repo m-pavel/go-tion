@@ -16,4 +16,6 @@ type Tion interface {
 	Update(s *Status, timeout time.Duration) error
 
 	Disconnect() error
+
+	Connected() bool
 }

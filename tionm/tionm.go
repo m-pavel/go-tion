@@ -34,6 +34,14 @@ func New(addr string, debug ...bool) tion.Tion {
 	return &nt
 }
 
+func (n *mTion) Connected() bool {
+	c, err := n.isConnected()
+	if err != nil {
+		return false
+	}
+	return c
+}
+
 func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 	n.m.Lock()
 	defer n.m.Unlock()

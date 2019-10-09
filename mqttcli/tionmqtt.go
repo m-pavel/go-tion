@@ -32,6 +32,7 @@ type mqttTion struct {
 
 	state  *tion.RestStatus
 	update chan *tion.RestStatus
+	aval   string
 }
 
 // New MQTT Tion backend
@@ -39,6 +40,10 @@ func New(url, user, pass string, ca string, topic, topica, topicc string, dbg bo
 	mqt := mqttTion{url: url, user: user, pass: pass, ca: ca, topic: topic, topica: topica, topicc: topicc, debug: dbg}
 	mqt.update = make(chan *tion.RestStatus)
 	return &mqt
+}
+
+func (mqt mqttTion) Connected() bool {
+	return "online" == mqt.aval
 }
 
 func (mqt *mqttTion) Connect(timeout time.Duration) error {
@@ -91,6 +96,7 @@ func (mqt *mqttTion) handleAlive(cli MQTT.Client, msg MQTT.Message) {
 	if mqt.debug {
 		log.Printf("Got MQTT alive update %v", msg)
 	}
+	mqt.aval = string(msg.Payload())
 }
 
 func (mqt *mqttTion) ReadState(timeout time.Duration) (*tion.Status, error) {

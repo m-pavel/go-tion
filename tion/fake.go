@@ -11,6 +11,9 @@ func NewFake() Tion {
 	return &fakeTion{}
 }
 
+func (ft fakeTion) Connected() bool {
+	return true
+}
 func (ft fakeTion) Connect(time.Duration) error {
 	return nil
 }

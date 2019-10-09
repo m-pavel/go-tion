@@ -32,6 +32,10 @@ type cRes struct {
 	e error
 }
 
+func (n tion) Connected() bool {
+	return n.g.Connected()
+}
+
 func (t *tion) Connect(timeout time.Duration) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
@@ -76,11 +80,11 @@ func (t *tion) rw() (*tion2.Status, error) {
 	if !t.g.Connected() {
 		return nil, errors.New("Not connected")
 	}
-	if err := t.g.Write(tion2.WRITE_CHARACT, tion2.StatusRequest); err != nil {
+	if err := t.g.Write(tion2.WriteCaract, tion2.StatusRequest); err != nil {
 		return nil, err
 	}
 	time.Sleep(2 * time.Second)
-	resp, n, err := t.g.Read(tion2.READ_CHARACT)
+	resp, n, err := t.g.Read(tion2.ReadCharact)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +105,7 @@ func (t *tion) Update(s *tion2.Status, timeout time.Duration) error {
 	c1 := make(chan error, 1)
 
 	go func() {
-		c1 <- t.g.Write(tion2.WRITE_CHARACT, tion2.FromStatus(s))
+		c1 <- t.g.Write(tion2.WriteCaract, tion2.FromStatus(s))
 	}()
 
 	select {

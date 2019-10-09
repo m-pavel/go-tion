@@ -28,6 +28,9 @@ func New(addr string, debug ...bool) tion.Tion {
 	}
 	return &nt
 }
+func (n nativeTion) Connected() bool {
+	return true // TODO
+}
 
 func (n *nativeTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 	if err := n.p.WriteCharacteristic(n.wc, tion.StatusRequest, true); err != nil {

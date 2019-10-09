@@ -61,7 +61,7 @@ func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, de
 	return nil
 }
 func (ts *TionService) cmStart() error {
-	if *ts.keepbt {
+	if *ts.keepbt && ts.t.Connected() {
 		return nil
 	}
 	return ts.t.Connect(timeout)

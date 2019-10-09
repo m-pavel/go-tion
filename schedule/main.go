@@ -92,7 +92,7 @@ func main() {
 		}
 		for _, sch := range s {
 			expr := cronexpr.MustParse(sch.Value).Next(time.Now())
-			fmt.Printf(status, sch.Id, sch.Value, fb(sch.Enabled), fb(sch.Heater), fb(sch.Sound), fi(sch.Temp), fi(sch.Speed), fg(sch.Gate), expr.Format("Mon Jan _2 15:04:05 2006"))
+			fmt.Printf(status, sch.ID, sch.Value, fb(sch.Enabled), fb(sch.Heater), fb(sch.Sound), fi(sch.Temp), fi(sch.Speed), fg(sch.Gate), expr.Format("Mon Jan _2 15:04:05 2006"))
 		}
 		return
 	}
@@ -212,13 +212,13 @@ func daemonf(device string, dao *Dao, repeat int) {
 			for {
 				expr := cronexpr.MustParse(s.Value).Next(time.Now())
 				mins := expr.Sub(time.Now()) / time.Minute
-				log.Printf("Next time for %d (%s) is %s in %d minute(s).\n", s.Id, fb(s.Enabled), expr.Format("Mon Jan _2 15:04:05 2006"), mins)
+				log.Printf("Next time for %d (%s) is %s in %d minute(s).\n", s.ID, fb(s.Enabled), expr.Format("Mon Jan _2 15:04:05 2006"), mins)
 				select {
 				case <-stop:
 					log.Println("Exiting")
 					break
 				case <-time.After(expr.Sub(time.Now())):
-					log.Printf("Executing %d\n", s.Id)
+					log.Printf("Executing %d\n", s.ID)
 					for i := 0; i < repeat; i++ {
 						err := execute(s, device, 5, 5*time.Second)
 						if err != nil {
