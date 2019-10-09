@@ -11,6 +11,7 @@ type RestStatus struct {
 	Target        int8   `json:"temp_target"`
 	Speed         *int8  `json:"speed"`
 	FilterRemains int    `json:"filters"`
+	Firmware      int    `json:"firmware"`
 }
 
 // RestFromStatus to RestStatus
@@ -25,6 +26,7 @@ func RestFromStatus(s *Status) *RestStatus {
 		Speed:         &s.Speed,
 		Sound:         s.SoundEnabled,
 		FilterRemains: s.FiltersRemains,
+		Firmware:      s.FirmwareVersion,
 	}
 }
 
@@ -44,5 +46,6 @@ func StatusFromRest(rs *RestStatus) *Status {
 	s.TempTarget = rs.Target
 	s.SoundEnabled = rs.Sound
 	s.FiltersRemains = rs.FilterRemains
+	s.FirmwareVersion = rs.Firmware
 	return &s
 }
