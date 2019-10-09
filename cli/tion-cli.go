@@ -13,28 +13,28 @@ import (
 )
 
 type cliDevice struct {
-	device    *string
-	mqtt      *string
-	mqtt_user *string
-	mqtt_pass *string
-	mqtt_ca   *string
-	mqtt_t    *string
-	mqtt_ta   *string
-	mqtt_tc   *string
-	debug     *bool
-	timeout   time.Duration
+	device           *string
+	mqtt             *string
+	mqttUser         *string
+	mqttPass         *string
+	mqttCa           *string
+	mqttTopic        *string
+	mqttAvalTopic    *string
+	mqttControlTopic *string
+	debug            *bool
+	timeout          time.Duration
 }
 
 func main() {
 	device := cliDevice{}
 	device.device = flag.String("device", "", "bt addr")
 	device.mqtt = flag.String("mqtt", "", "MQTT addr")
-	device.mqtt_user = flag.String("mqtt-u", "", "MQTT user")
-	device.mqtt_pass = flag.String("mqtt-p", "", "MQTT password")
-	device.mqtt_ca = flag.String("mqtt-ca", "", "MQTT ca")
-	device.mqtt_t = flag.String("mqtt-t", "", "MQTT status topic")
-	device.mqtt_ta = flag.String("mqtt-ta", "", "MQTT availability topic")
-	device.mqtt_tc = flag.String("mqtt-tc", "", "MQTT control topic")
+	device.mqttUser = flag.String("mqtt-u", "", "MQTT user")
+	device.mqttPass = flag.String("mqtt-p", "", "MQTT password")
+	device.mqttCa = flag.String("mqtt-ca", "", "MQTT ca")
+	device.mqttTopic = flag.String("mqtt-t", "", "MQTT status topic")
+	device.mqttAvalTopic = flag.String("mqtt-ta", "", "MQTT availability topic")
+	device.mqttControlTopic = flag.String("mqtt-tc", "", "MQTT control topic")
 	var status = flag.Bool("status", true, "Request status")
 	var scanp = flag.Bool("scan", false, "Perform scan")
 	device.debug = flag.Bool("debug", false, "Debug")
@@ -169,7 +169,7 @@ func newDevice(device *cliDevice) tion.Tion {
 		return tionm.New(*device.device, *device.debug)
 	}
 	if *device.mqtt != "" {
-		return mqttcli.New(*device.mqtt, *device.mqtt_user, *device.mqtt_pass, *device.mqtt_ca, *device.mqtt_t, *device.mqtt_ta, *device.mqtt_tc, *device.debug)
+		return mqttcli.New(*device.mqtt, *device.mqttUser, *device.mqttPass, *device.mqttCa, *device.mqttTopic, *device.mqttAvalTopic, *device.mqttControlTopic, *device.debug)
 	}
 	log.Panic("Unable to create device")
 	return nil

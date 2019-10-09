@@ -18,6 +18,7 @@ import (
 
 const timeout = 7 * time.Second
 
+// TionService instance
 type TionService struct {
 	t      tion.Tion
 	bt     *string
@@ -55,14 +56,14 @@ func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, de
 	}
 	return nil
 }
-func (ts *TionService) cm_start() error {
+func (ts *TionService) cmStart() error {
 	if *ts.keepbt {
 		return nil
 	} else {
 		return ts.t.Connect(timeout)
 	}
 }
-func (ts *TionService) cm_end() error {
+func (ts *TionService) cmEnd() error {
 	if *ts.keepbt {
 		return nil
 	} else {
@@ -71,10 +72,10 @@ func (ts *TionService) cm_end() error {
 }
 
 func (ts TionService) Do() (interface{}, error) {
-	if err := ts.cm_start(); err != nil {
+	if err := ts.cmStart(); err != nil {
 		return nil, err
 	}
-	defer ts.cm_end()
+	defer ts.cmEnd()
 	s, err := ts.t.ReadState(timeout)
 	if err != nil {
 		return nil, err
@@ -97,11 +98,11 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		log.Println(req)
 	}
 
-	if err := ts.cm_start(); err != nil {
+	if err := ts.cmStart(); err != nil {
 		log.Println(err)
 		return
 	}
-	defer ts.cm_end()
+	defer ts.cmEnd()
 
 	cs, err := ts.t.ReadState(timeout)
 	if err != nil {

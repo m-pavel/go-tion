@@ -18,6 +18,7 @@ type tion struct {
 	mutex *sync.Mutex
 }
 
+// New gattlib backend
 func New(addr string, debug ...bool) tion2.Tion {
 	t := tion{Addr: addr, g: &gattlib.Gatt{}, mutex: &sync.Mutex{}}
 	if len(debug) == 1 && debug[0] {

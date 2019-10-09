@@ -24,6 +24,7 @@ type mTion struct {
 	d *device.Device1
 }
 
+// New go ble backend
 func New(addr string, debug ...bool) tion.Tion {
 	nt := mTion{addr: addr, m: sync.Mutex{}}
 	nt.cnct = make(chan error)
@@ -36,6 +37,7 @@ func New(addr string, debug ...bool) tion.Tion {
 func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 	n.m.Lock()
 	defer n.m.Unlock()
+
 	if c, err := n.isConnected(); err != nil {
 		return nil, err
 	} else {
@@ -43,7 +45,8 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 			return nil, errors.New("Not connected")
 		}
 	}
-	wc, err := n.d.GetCharByUUID(tion.WRITE_CHARACT)
+
+	wc, err := n.d.GetCharByUUID(tion.WriteCaract)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -53,20 +56,21 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 		return nil, err
 	}
 	time.Sleep(200 * time.Millisecond)
-	rc, err := n.d.GetCharByUUID(tion.READ_CHARACT)
+	rc, err := n.d.GetCharByUUID(tion.ReadCharact)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
-	if data, err := rc.ReadValue(nil); err != nil {
+	var data []byte
+	if data, err = rc.ReadValue(nil); err != nil {
 		log.Println(err)
 		return nil, err
-	} else {
-		if n.debug {
-			log.Printf("RSP: %v\n", data)
-		}
-		return tion.FromBytes(data)
 	}
+	if n.debug {
+		log.Printf("RSP: %v\n", data)
+	}
+	return tion.FromBytes(data)
+
 }
 
 func (n *mTion) Update(s *tion.Status, timeout time.Duration) error {
@@ -79,7 +83,7 @@ func (n *mTion) Update(s *tion.Status, timeout time.Duration) error {
 			return errors.New("Not connected")
 		}
 	}
-	wc, err := n.d.GetCharByUUID(tion.WRITE_CHARACT)
+	wc, err := n.d.GetCharByUUID(tion.WriteCaract)
 	if err != nil {
 		return err
 	}
@@ -93,7 +97,7 @@ func (n *mTion) Update(s *tion.Status, timeout time.Duration) error {
 	case res := <-c1:
 		return res
 	case <-time.After(timeout):
-		return errors.New(fmt.Sprintf("Write timeout %d", timeout))
+		return fmt.Errorf("Write timeout %d", timeout)
 	}
 }
 
@@ -119,7 +123,7 @@ func (n *mTion) Connect(timeout time.Duration) error {
 		return err
 	} else {
 		if !p {
-			return errors.New(fmt.Sprintf("Device %s is not paired. Pair with bluetoothctrl.", n.addr))
+			return fmt.Errorf("Device %s is not paired. Pair with bluetoothctrl", n.addr)
 		}
 	}
 	if err = n.d.Connect(); err != nil {

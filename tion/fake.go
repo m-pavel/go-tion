@@ -6,6 +6,7 @@ type fakeTion struct {
 	s Status
 }
 
+// NewFake backend
 func NewFake() Tion {
 	return &fakeTion{}
 }

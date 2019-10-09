@@ -19,6 +19,7 @@ type nativeTion struct {
 	debug  bool
 }
 
+// New go gatt backend
 func New(addr string, debug ...bool) tion.Tion {
 	nt := nativeTion{addr: addr}
 	nt.cnct = make(chan error)
@@ -79,7 +80,7 @@ func (n *nativeTion) Connect(timeout time.Duration) error {
 	case res := <-n.cnct:
 		return res
 	case <-time.After(timeout):
-		return errors.New(fmt.Sprintf("Connect timeout (%d)", timeout))
+		return fmt.Errorf("Connect timeout (%d)", timeout)
 	}
 }
 
@@ -106,20 +107,20 @@ func (n *nativeTion) onPeriphConnected(p gatt.Peripheral, err error) {
 
 		for _, c := range cs {
 			log.Printf("%v %v\n", service.UUID().String(), c.UUID().String())
-			if c.UUID().Equal(gatt.MustParseUUID(tion.WRITE_CHARACT)) {
+			if c.UUID().Equal(gatt.MustParseUUID(tion.WriteCaract)) {
 				n.wc = c
 			}
-			if c.UUID().Equal(gatt.MustParseUUID(tion.READ_CHARACT)) {
+			if c.UUID().Equal(gatt.MustParseUUID(tion.ReadCharact)) {
 				n.rc = c
 			}
 		}
 	}
 
 	if n.wc == nil {
-		n.cnct <- errors.New("Unable to find write characteristic.")
+		n.cnct <- errors.New("Unable to find write characteristic")
 	}
 	if n.rc == nil {
-		n.cnct <- errors.New("Unable to find read characteristic.")
+		n.cnct <- errors.New("Unable to find read characteristic")
 	}
 
 	if dd, err := p.DiscoverDescriptors(nil, n.rc); err != nil {

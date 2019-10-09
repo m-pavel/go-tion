@@ -2,11 +2,13 @@ package tion
 
 import "time"
 
+// BLE Characteristics
 const (
-	WRITE_CHARACT = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
-	READ_CHARACT  = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
+	WriteCaract = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
+	ReadCharact = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
 )
 
+// Tion brazer interface
 type Tion interface {
 	Connect(timeout time.Duration) error
 

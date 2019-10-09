@@ -1,5 +1,6 @@
 package tion
 
+// RestStatus structure
 type RestStatus struct {
 	Gate          string `json:"gate"`
 	On            *bool  `json:"on"`
@@ -12,6 +13,7 @@ type RestStatus struct {
 	FilterRemains int    `json:"filters"`
 }
 
+// RestFromStatus to RestStatus
 func RestFromStatus(s *Status) *RestStatus {
 	return &RestStatus{
 		Gate:          s.GateStatus(),
@@ -26,6 +28,7 @@ func RestFromStatus(s *Status) *RestStatus {
 	}
 }
 
+// StatusFromRest to Status
 func StatusFromRest(rs *RestStatus) *Status {
 	s := Status{}
 	s.SetGateStatus(rs.Gate)

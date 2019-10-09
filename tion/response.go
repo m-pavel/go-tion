@@ -29,6 +29,7 @@ type Status struct {
 	Todo            int8
 }
 
+// GateStatus from int
 func GateStatus(v int8) string {
 	switch v {
 	case 0:
@@ -41,10 +42,13 @@ func GateStatus(v int8) string {
 		return "unknown"
 	}
 }
+
+// GateStatus string presenation
 func (s Status) GateStatus() string {
 	return GateStatus(s.Gate)
 }
 
+// SetGateStatus by given string
 func (s *Status) SetGateStatus(str string) {
 	switch str {
 	case "indoor":
@@ -71,6 +75,7 @@ func sts(b bool) string {
 	return "off"
 }
 
+// FromBytes to Status
 func FromBytes(bytes []byte) (*Status, error) {
 	if len(bytes) < 20 {
 		return nil, errors.New(fmt.Sprintf("Expecting 20 bytes array. Got %d", len(bytes)))

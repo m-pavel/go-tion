@@ -8,10 +8,12 @@ var (
 	StatusRequest = []byte{0x3d, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5a}
 )
 
+// FromStatus to bytes
 func FromStatus(s *Status) []byte {
 	return BuildRequest(s.Enabled, s.SoundEnabled, s.HeaterEnabled, s.Speed, s.Gate, s.TempTarget)
 }
 
+// BuildRequest with given parameters
 func BuildRequest(enabled, sound, heater bool, speed, gate, temp int8) []byte {
 	bf := bytes.NewBufferString("")
 	bf.WriteByte(0x3d)
