@@ -12,6 +12,8 @@ import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/m-pavel/go-hassio-mqtt/pkg"
 
+	"net/http"
+
 	"github.com/m-pavel/go-tion/tion"
 	"github.com/m-pavel/go-tion/tionm"
 )
@@ -41,6 +43,9 @@ func (ts TionService) Name() string { return "tion" }
 
 // Init TionService
 func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, debug bool, ss ghm.SendState) error {
+	go func() {
+		log.Println(http.ListenAndServe(":7070", nil))
+	}()
 	if *ts.fake {
 		log.Println("Using fake device.")
 		ts.t = tion.NewFake()
