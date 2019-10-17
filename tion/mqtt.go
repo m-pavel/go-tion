@@ -22,6 +22,10 @@ type RestStatus struct {
 
 // RestFromStatus to RestStatus
 func RestFromStatus(s *Status) *RestStatus {
+	speed := s.Speed
+	if !s.Enabled {
+		speed = 0
+	}
 	return &RestStatus{
 		Gate:          s.GateStatus(),
 		On:            &s.Enabled,
@@ -29,7 +33,7 @@ func RestFromStatus(s *Status) *RestStatus {
 		Out:           s.TempOut,
 		In:            s.TempIn,
 		Target:        s.TempTarget,
-		Speed:         &s.Speed,
+		Speed:         &speed,
 		Sound:         s.SoundEnabled,
 		FilterRemains: s.FiltersRemains,
 		Firmware:      s.FirmwareVersion,
