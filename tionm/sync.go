@@ -35,6 +35,6 @@ func (sm *SyncTimeout) Call(timeout time.Duration, callback Callback) (interface
 		log.Println(err)
 		return nil, err
 	case <-time.After(timeout):
-		return nil, fmt.Errorf("Calltimeout %d sec.", timeout.Seconds())
+		return nil, fmt.Errorf("Calltimeout %f sec.", timeout.Seconds())
 	}
 }
