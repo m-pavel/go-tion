@@ -106,6 +106,7 @@ func (n *mTion) Update(s *tion.Status, timeout time.Duration) error {
 			return
 		}
 		wc.WriteValue(tion.FromStatus(s), nil)
+		stc <- nil
 	})
 	return err
 }
@@ -149,6 +150,7 @@ func (n *mTion) Connect(timeout time.Duration) error {
 			ec <- err
 			return
 		}
+		stc <- nil
 	})
 	return err
 }
@@ -176,7 +178,11 @@ func (n *mTion) Disconnect(timeout time.Duration) error {
 					return
 				}
 			}
-			ec <- n.d.Disconnect()
+			if err := n.d.Disconnect(); err != nil {
+				ec <- err
+				return
+			}
+			stc <- nil
 		})
 		return err
 	}
