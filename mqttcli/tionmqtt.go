@@ -125,7 +125,7 @@ func (mqt *mqttTion) Update(s *tion.Status, timeout time.Duration) error {
 	return nil
 }
 
-func (mqt *mqttTion) Disconnect() error {
-	mqt.cli.Disconnect(200)
+func (mqt *mqttTion) Disconnect(tm time.Duration) error {
+	mqt.cli.Disconnect(uint(tm / time.Millisecond))
 	return nil
 }

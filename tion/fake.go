@@ -17,7 +17,7 @@ func (ft fakeTion) Connected() bool {
 func (ft fakeTion) Connect(time.Duration) error {
 	return nil
 }
-func (ft fakeTion) Disconnect() error {
+func (ft fakeTion) Disconnect(time.Duration) error {
 	return nil
 }
 func (ft fakeTion) ReadState(time.Duration) (*Status, error) {

@@ -160,7 +160,7 @@ func onStateChanged(d gatt.Device, s gatt.State) {
 	}
 }
 
-func (n *nativeTion) Disconnect() error {
+func (n *nativeTion) Disconnect(time.Duration) error {
 	if n.p != nil {
 		// TODO
 	}

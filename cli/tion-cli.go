@@ -133,7 +133,7 @@ func main() {
 			log.Printf("Connect error: %v\n", err)
 			return
 		}
-		defer t.Disconnect()
+		defer t.Disconnect(device.timeout)
 		state, err := t.ReadState(device.timeout)
 		if err != nil {
 			log.Println(err)
@@ -149,7 +149,7 @@ func deviceCall(device *cliDevice, cb func(tion.Tion, *tion.Status) error, succ 
 	if err := t.Connect(device.timeout); err != nil {
 		return err
 	}
-	defer t.Disconnect()
+	defer t.Disconnect(device.timeout)
 	s, err := t.ReadState(device.timeout)
 	if err != nil {
 		return err

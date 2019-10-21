@@ -75,7 +75,7 @@ func (ts *TionService) cmEnd() error {
 	if *ts.keepbt {
 		return nil
 	}
-	return ts.t.Disconnect()
+	return ts.t.Disconnect(timeout)
 }
 
 // Do TionService
@@ -164,7 +164,7 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 
 // Close TionService
 func (ts TionService) Close() error {
-	return ts.t.Disconnect()
+	return ts.t.Disconnect(timeout)
 }
 
 func main() {

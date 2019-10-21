@@ -239,7 +239,7 @@ func execute(s Schedule, device string, retry int, interval time.Duration) error
 	if err := t.Connect(timeout); err != nil {
 		return err
 	}
-	defer t.Disconnect()
+	defer t.Disconnect(timeout)
 	ts, err := t.ReadState(timeout)
 	if err != nil {
 		return err

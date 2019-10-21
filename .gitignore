@@ -4,3 +4,5 @@ tion-mqtt
 tion-schedule
 schedule.db
 .idea/
+tion.log
+tion.pid

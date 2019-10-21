@@ -11,11 +11,10 @@ const (
 // Tion brazer interface
 type Tion interface {
 	Connect(timeout time.Duration) error
+	Disconnect(timeout time.Duration) error
+
+	Connected() bool
 
 	ReadState(timeout time.Duration) (*Status, error)
 	Update(s *Status, timeout time.Duration) error
-
-	Disconnect() error
-
-	Connected() bool
 }

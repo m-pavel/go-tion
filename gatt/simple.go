@@ -44,7 +44,7 @@ func (t *tion) Connect(timeout time.Duration) error {
 	}
 	return t.g.Connect(t.Addr)
 }
-func (t *tion) Disconnect() error {
+func (t *tion) Disconnect(duration time.Duration) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	if t.g.Connected() {
