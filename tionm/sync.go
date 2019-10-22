@@ -7,17 +7,21 @@ import (
 	"time"
 )
 
+// SyncTimeout provides syncronized calls with timeout
 type SyncTimeout struct {
 	m sync.Mutex
 }
 
+// NewSt structure
 func NewSt() *SyncTimeout {
 	st := SyncTimeout{m: sync.Mutex{}}
 	return &st
 }
 
+// Callback function
 type Callback func(chan interface{}, chan error)
 
+// Call callback
 func (sm *SyncTimeout) Call(timeout time.Duration, callback Callback) (interface{}, error) {
 	dc := make(chan interface{}, 1)
 	ec := make(chan error, 1)
@@ -35,6 +39,6 @@ func (sm *SyncTimeout) Call(timeout time.Duration, callback Callback) (interface
 		log.Println(err)
 		return nil, err
 	case <-time.After(timeout):
-		return nil, fmt.Errorf("Calltimeout %.2f sec.", timeout.Seconds())
+		return nil, fmt.Errorf("calltimeout %.2f sec", timeout.Seconds())
 	}
 }

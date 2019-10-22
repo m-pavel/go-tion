@@ -32,8 +32,8 @@ type cRes struct {
 	e error
 }
 
-func (n tion) Connected() bool {
-	return n.g.Connected()
+func (t tion) Connected() bool {
+	return t.g.Connected()
 }
 
 func (t *tion) Connect(timeout time.Duration) error {
