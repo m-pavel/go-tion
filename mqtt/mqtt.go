@@ -56,7 +56,7 @@ func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, de
 	ts.debug = debug
 	ts.ss = ss
 
-	if token := client.Subscribe(topicc, 2, ts.control); token.Error() != nil {
+	if token := client.Subscribe(topicc, 2, ts.control); token.WaitTimeout(timeout) && token.Error() != nil {
 		return token.Error()
 	}
 
