@@ -86,7 +86,11 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 		}
 
 	})
-	return data.(*tion.Status), err
+	if data != nil {
+		return data.(*tion.Status), err
+	} else {
+		return nil, err
+	}
 }
 
 func (n *mTion) Update(s *tion.Status, timeout time.Duration) error {
