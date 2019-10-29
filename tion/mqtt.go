@@ -8,7 +8,7 @@ type RestStatus struct {
 	Sound         bool   `json:"sound"`
 	Out           int8   `json:"temp_out"`
 	In            int8   `json:"temp_in"`
-	Target        int8   `json:"temp_target"`
+	Target        *int8  `json:"temp_target"`
 	Speed         *int8  `json:"speed"`
 	FilterRemains int    `json:"filters"`
 	Firmware      int    `json:"firmware"`
@@ -32,7 +32,7 @@ func RestFromStatus(s *Status) *RestStatus {
 		Heater:        &s.HeaterEnabled,
 		Out:           s.TempOut,
 		In:            s.TempIn,
-		Target:        s.TempTarget,
+		Target:        &s.TempTarget,
 		Speed:         &speed,
 		Sound:         s.SoundEnabled,
 		FilterRemains: s.FiltersRemains,
@@ -60,7 +60,9 @@ func StatusFromRest(rs *RestStatus) *Status {
 	}
 	s.TempOut = rs.Out
 	s.TempIn = rs.In
-	s.TempTarget = rs.Target
+	if rs.Target != nil {
+		s.TempTarget = *rs.Target
+	}
 	s.SoundEnabled = rs.Sound
 	s.FiltersRemains = rs.FilterRemains
 	s.FirmwareVersion = rs.Firmware

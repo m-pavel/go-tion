@@ -131,7 +131,14 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 			needupdate = true
 		}
 	}
-	// 2. State
+	// 3. Temp
+	if req.Target != nil {
+		if cs.TempTarget != *req.Target {
+			cs.TempTarget = *req.Target
+			needupdate = true
+		}
+	}
+	// 77. State
 	if req.On != nil {
 		if cs.Enabled {
 			if !*req.On {
