@@ -29,8 +29,8 @@ func main() {
 	device := cliDevice{}
 	device.device = flag.String("device", "", "bt addr")
 	device.mqtt = flag.String("mqtt", "", "MQTT addr")
-	device.mqttUser = flag.String("mqtt-u", "", "MQTT user")
-	device.mqttPass = flag.String("mqtt-p", "", "MQTT password")
+	device.mqttUser = flag.String("mqtt-user", "", "MQTT user")
+	device.mqttPass = flag.String("mqtt-password", "", "MQTT password")
 	device.mqttCa = flag.String("mqtt-ca", "", "MQTT ca")
 	device.mqttTopic = flag.String("mqtt-t", "", "MQTT status topic")
 	device.mqttAvalTopic = flag.String("mqtt-ta", "", "MQTT availability topic")
