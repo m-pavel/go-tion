@@ -118,46 +118,44 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		return
 	}
 
+	needupdate := false
 	// 1. Speed
 	if req.Speed != nil && *req.Speed != cs.Speed {
 		cs.Speed = *req.Speed
-		err = ts.t.Update(cs, timeout)
-		if err != nil {
-			log.Println(err)
-		} else {
-			ts.ss()
-			log.Printf("Updated speed to %d by MQTT request\n", *req.Speed)
+		needupdate = true
+	}
+	// 2. Heater
+	if req.Heater != nil {
+		if cs.HeaterEnabled != *req.Heater {
+			cs.HeaterEnabled = *req.Heater
+			needupdate = true
 		}
-
 	}
 	// 2. State
 	if req.On != nil {
 		if cs.Enabled {
 			if !*req.On {
 				cs.Enabled = false
-				err = ts.t.Update(cs, timeout)
-				if err != nil {
-					log.Println(err)
-				} else {
-					ts.ss()
-					log.Println("Turned off by MQTT request")
-				}
+				needupdate = true
 			} else {
 				log.Println("Already on")
 			}
 		} else {
 			if *req.On {
 				cs.Enabled = true
-				err = ts.t.Update(cs, timeout)
-				if err != nil {
-					log.Println(err)
-				} else {
-					ts.ss()
-					log.Println("Turned on  by MQTT request")
-				}
+				needupdate = true
 			} else {
 				log.Println("Already off")
 			}
+		}
+	}
+
+	if needupdate {
+		if err = ts.t.Update(cs, timeout); err != nil {
+			log.Println(err)
+		} else {
+			ts.ss()
+			log.Println("Made update by MQTT request")
 		}
 	}
 
