@@ -119,7 +119,7 @@ func (mqt *mqttTion) Update(s *tion.Status, timeout time.Duration) error {
 	if err != nil {
 		return err
 	}
-	if token := mqt.cli.Publish(mqt.topicc, 1, false, b); token.Wait() && token.Error() != nil {
+	if token := mqt.cli.Publish(mqt.topicc, 2, false, b); token.Wait() && token.Error() != nil {
 		return token.Error()
 	}
 	return nil
