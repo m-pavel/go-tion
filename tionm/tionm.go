@@ -131,9 +131,12 @@ func (n *mTion) Connect(timeout time.Duration) error {
 			ec <- err
 			return
 		}
-		n.d, err = ad.GetDeviceByAddress(n.addr)
-		if err != nil {
+		if n.d, err = ad.GetDeviceByAddress(n.addr); err != nil {
 			ec <- err
+			return
+		}
+		if n.d == nil {
+			ec <- fmt.Errorf("Device %s not available", n.addr)
 			return
 		}
 		if p, err := n.d.GetPaired(); err != nil {
