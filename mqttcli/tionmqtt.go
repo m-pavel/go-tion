@@ -105,7 +105,7 @@ func (mqt *mqttTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 		case <-mqt.update:
 			break
 		case <-time.After(timeout):
-			log.Printf("Timeout %ds reached.\n", timeout.Seconds())
+			log.Printf("Timeout %.0fs reached.\n", timeout.Seconds())
 
 		}
 		if mqt.state == nil {
