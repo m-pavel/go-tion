@@ -46,7 +46,7 @@ func (mqt mqttTion) Connected() bool {
 	return "online" == mqt.aval
 }
 
-func (mqtt mqttTion) Info() string {
+func (mqt mqttTion) Info() string {
 	return "github.com/eclipse/paho.mqtt.golang"
 }
 

@@ -12,6 +12,7 @@ test: deps
 
 lint: deps
 	${GF} ${GOPATH}/bin/golangci-lint run -v ./...
+	${GF} ${GOPATH}/bin/golint  $$(go list ./... | grep -v /vendor/)
 
 build-cli: deps
 	${GF} go build -o tion-cli ./cli
