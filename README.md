@@ -58,3 +58,6 @@ Turn on/off
     }
 ```
 
+## Magic
+ When getting 'Unexpected response length' with muka driver, run once with ppal driver
+ 
