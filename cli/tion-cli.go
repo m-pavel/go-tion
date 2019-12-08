@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/m-pavel/go-tion/impl/fake"
+
 	"time"
 
 	tion_gatt "github.com/m-pavel/go-tion/impl/gatt"
@@ -20,7 +22,6 @@ import (
 type cliDevice struct {
 	device           *string
 	driver           *string
-	mqtt             *string
 	mqttUser         *string
 	mqttPass         *string
 	mqttCa           *string
@@ -33,8 +34,7 @@ type cliDevice struct {
 
 func main() {
 	device := cliDevice{}
-	device.device = flag.String("device", "", "bt addr")
-	device.mqtt = flag.String("mqtt", "", "MQTT addr")
+	device.device = flag.String("device", "", "BT (or MQTT) address")
 	device.driver = flag.String("driver", "muka", "driver")
 	device.mqttUser = flag.String("mqtt-user", "", "MQTT user")
 	device.mqttPass = flag.String("mqtt-pass", "", "MQTT password")
@@ -57,7 +57,7 @@ func main() {
 	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
 
 	device.timeout = time.Duration(*timeoutp) * time.Second
-	if *device.device == "" && !*scanp && *device.mqtt == "" {
+	if *device.device == "" {
 		log.Fatal("Device address or MQTT is mandatory")
 	}
 
@@ -192,13 +192,14 @@ func newDevice(device *cliDevice) tion.Tion {
 			return tion_ppal.New(*device.device, *device.debug)
 		case "gatt":
 			return tion_gatt.New(*device.device, *device.debug)
+		case "mqtt":
+			return mqttcli.New(*device.device, *device.mqttUser, *device.mqttPass, *device.mqttCa, *device.mqttTopic, *device.mqttAvalTopic, *device.mqttControlTopic, *device.debug)
+		case "fake":
+			return fake.NewFake()
 		}
 		panic("Unknown driver " + *device.driver)
 	}
 
-	if *device.mqtt != "" {
-		return mqttcli.New(*device.mqtt, *device.mqttUser, *device.mqttPass, *device.mqttCa, *device.mqttTopic, *device.mqttAvalTopic, *device.mqttControlTopic, *device.debug)
-	}
 	log.Panic("Unable to create device")
 	return nil
 }
