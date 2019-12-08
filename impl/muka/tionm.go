@@ -1,4 +1,4 @@
-package tionm
+package muka
 
 import (
 	"errors"
@@ -21,6 +21,10 @@ type mTion struct {
 	d *device.Device1
 
 	st *SyncTimeout
+}
+
+func (n mTion) Info() string {
+	return "github.com/muka/go-bluetooth/api"
 }
 
 // New go ble backend

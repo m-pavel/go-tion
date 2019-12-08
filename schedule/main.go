@@ -13,7 +13,7 @@ import (
 
 	"github.com/gorhill/cronexpr"
 
-	"github.com/m-pavel/go-tion/tionm"
+	tionimpl "github.com/m-pavel/go-tion/impl/muka"
 	"github.com/sevlyar/go-daemon"
 )
 
@@ -235,7 +235,7 @@ func daemonf(device string, dao *Dao, repeat int) {
 }
 
 func execute(s Schedule, device string, retry int, interval time.Duration) error {
-	t := tionm.New(device)
+	t := tionimpl.New(device)
 	if err := t.Connect(timeout); err != nil {
 		return err
 	}

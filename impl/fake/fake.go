@@ -1,14 +1,22 @@
-package tion
+package fake
 
-import "time"
+import (
+	"time"
+
+	"github.com/m-pavel/go-tion/tion"
+)
 
 type fakeTion struct {
-	s Status
+	s tion.Status
 }
 
 // NewFake backend
-func NewFake() Tion {
+func NewFake() tion.Tion {
 	return &fakeTion{}
+}
+
+func (ft fakeTion) Info() string {
+	return "fake"
 }
 
 func (ft fakeTion) Connected() bool {
@@ -20,10 +28,10 @@ func (ft fakeTion) Connect(time.Duration) error {
 func (ft fakeTion) Disconnect(time.Duration) error {
 	return nil
 }
-func (ft fakeTion) ReadState(time.Duration) (*Status, error) {
+func (ft fakeTion) ReadState(time.Duration) (*tion.Status, error) {
 	return &ft.s, nil
 }
-func (ft *fakeTion) Update(s *Status, tm time.Duration) error {
+func (ft *fakeTion) Update(s *tion.Status, tm time.Duration) error {
 	ft.s = *s
 	return nil
 }

@@ -1,4 +1,4 @@
-package tionn
+package ppal
 
 import (
 	"log"
@@ -28,6 +28,11 @@ func New(addr string, debug ...bool) tion.Tion {
 	}
 	return &nt
 }
+
+func (n nativeTion) Info() string {
+	return "github.com/paypal/gatt"
+}
+
 func (n nativeTion) Connected() bool {
 	return true // TODO
 }

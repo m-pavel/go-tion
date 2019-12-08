@@ -7,11 +7,14 @@ import (
 
 	"time"
 
-	"github.com/m-pavel/go-tion/mqttcli"
+	"github.com/m-pavel/go-tion/impl/mqttcli"
+	timpl "github.com/m-pavel/go-tion/impl/muka"
 	"github.com/m-pavel/go-tion/tion"
-	"github.com/m-pavel/go-tion/tionm"
 )
 
+// timpl "github.com/m-pavel/go-tion/tionm" works
+// timpl "github.com/m-pavel/go-tion/tionn"
+// timpl "github.com/m-pavel/go-tion/gatt" works
 type cliDevice struct {
 	device           *string
 	mqtt             *string
@@ -129,6 +132,7 @@ func main() {
 
 	if *status {
 		t := newDevice(&device)
+		log.Printf("Using implementation %s\n", t.Info())
 		if err := t.Connect(device.timeout); err != nil {
 			log.Printf("Connect error: %v\n", err)
 			return
@@ -166,7 +170,7 @@ func deviceCall(device *cliDevice, cb func(tion.Tion, *tion.Status) error, succ 
 
 func newDevice(device *cliDevice) tion.Tion {
 	if *device.device != "" {
-		return tionm.New(*device.device, *device.debug)
+		return timpl.New(*device.device, *device.debug)
 	}
 	if *device.mqtt != "" {
 		return mqttcli.New(*device.mqtt, *device.mqttUser, *device.mqttPass, *device.mqttCa, *device.mqttTopic, *device.mqttAvalTopic, *device.mqttControlTopic, *device.debug)

@@ -46,6 +46,10 @@ func (mqt mqttTion) Connected() bool {
 	return "online" == mqt.aval
 }
 
+func (mqtt mqttTion) Info() string {
+	return "github.com/eclipse/paho.mqtt.golang"
+}
+
 func (mqt *mqttTion) Connect(timeout time.Duration) error {
 	opts := MQTT.NewClientOptions().AddBroker(mqt.url)
 

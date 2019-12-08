@@ -7,6 +7,9 @@ import (
 	_ "net/http"
 	_ "net/http/pprof"
 
+	"github.com/m-pavel/go-tion/impl/fake"
+	tionimpl "github.com/m-pavel/go-tion/impl/muka"
+
 	"time"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -15,7 +18,6 @@ import (
 	"net/http"
 
 	"github.com/m-pavel/go-tion/tion"
-	"github.com/m-pavel/go-tion/tionm"
 )
 
 const timeout = 7 * time.Second
@@ -48,9 +50,9 @@ func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, de
 	}()
 	if *ts.fake {
 		log.Println("Using fake device.")
-		ts.t = tion.NewFake()
+		ts.t = fake.NewFake()
 	} else {
-		ts.t = tionm.New(*ts.bt, debug)
+		ts.t = tionimpl.New(*ts.bt, debug)
 	}
 
 	ts.debug = debug

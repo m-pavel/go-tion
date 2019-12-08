@@ -17,4 +17,6 @@ type Tion interface {
 
 	ReadState(timeout time.Duration) (*Status, error)
 	Update(s *Status, timeout time.Duration) error
+
+	Info() string
 }

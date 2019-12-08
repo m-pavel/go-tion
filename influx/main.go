@@ -14,8 +14,8 @@ import (
 	"net/http"
 
 	"github.com/influxdata/influxdb1-client/v2"
+	tionimpl "github.com/m-pavel/go-tion/impl/muka"
 	"github.com/m-pavel/go-tion/tion"
-	"github.com/m-pavel/go-tion/gatt"
 	"github.com/sevlyar/go-daemon"
 )
 
@@ -82,7 +82,7 @@ func daemonf(iserver, device string, interval int) {
 	}
 	defer cli.Close()
 
-	t := gatt.New(device)
+	t := tionimpl.New(device)
 
 	erinr := 0
 	for {

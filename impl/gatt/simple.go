@@ -27,6 +27,10 @@ func New(addr string, debug ...bool) tion2.Tion {
 	return &t
 }
 
+func (t tion) Info() string {
+	return "github.com/m-pavel/go-tion/tion"
+}
+
 type cRes struct {
 	s *tion2.Status
 	e error
