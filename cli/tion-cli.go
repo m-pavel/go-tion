@@ -7,8 +7,10 @@ import (
 
 	"time"
 
+	tion_gatt "github.com/m-pavel/go-tion/impl/gatt"
 	"github.com/m-pavel/go-tion/impl/mqttcli"
-	timpl "github.com/m-pavel/go-tion/impl/muka"
+	tion_muka "github.com/m-pavel/go-tion/impl/muka"
+	tion_ppal "github.com/m-pavel/go-tion/impl/ppal"
 	"github.com/m-pavel/go-tion/tion"
 )
 
@@ -17,6 +19,7 @@ import (
 // timpl "github.com/m-pavel/go-tion/gatt" works
 type cliDevice struct {
 	device           *string
+	driver           *string
 	mqtt             *string
 	mqttUser         *string
 	mqttPass         *string
@@ -32,6 +35,7 @@ func main() {
 	device := cliDevice{}
 	device.device = flag.String("device", "", "bt addr")
 	device.mqtt = flag.String("mqtt", "", "MQTT addr")
+	device.driver = flag.String("driver", "muka", "driver")
 	device.mqttUser = flag.String("mqtt-user", "", "MQTT user")
 	device.mqttPass = flag.String("mqtt-pass", "", "MQTT password")
 	device.mqttCa = flag.String("mqtt-ca", "", "MQTT ca")
@@ -58,7 +62,7 @@ func main() {
 	}
 
 	if *on {
-		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
+		deviceCallLog(&device, func(t tion.Tion, s *tion.Status) error {
 			s.Enabled = true
 			return t.Update(s, device.timeout)
 		}, "Turned on")
@@ -66,14 +70,14 @@ func main() {
 		return
 	}
 	if *off {
-		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
+		deviceCallLog(&device, func(t tion.Tion, s *tion.Status) error {
 			s.Enabled = false
 			return t.Update(s, device.timeout)
 		}, "Turned off")
 		return
 	}
 	if *temp != 0 {
-		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
+		deviceCallLog(&device, func(t tion.Tion, s *tion.Status) error {
 			s.TempTarget = int8(*temp)
 			return t.Update(s, device.timeout)
 		}, fmt.Sprintf("Target temperature updated to %d", *temp))
@@ -85,7 +89,7 @@ func main() {
 			log.Println("Speed range 1..6")
 			return
 		}
-		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
+		deviceCallLog(&device, func(t tion.Tion, s *tion.Status) error {
 			s.Speed = int8(*speed)
 			return t.Update(s, device.timeout)
 		}, fmt.Sprintf("Speed updated to %d", *speed))
@@ -93,7 +97,7 @@ func main() {
 	}
 
 	if *gate != "" {
-		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
+		deviceCallLog(&device, func(t tion.Tion, s *tion.Status) error {
 			s.SetGateStatus(*gate)
 			return t.Update(s, device.timeout)
 		}, fmt.Sprintf("Gate set to %s", *gate))
@@ -101,7 +105,7 @@ func main() {
 	}
 
 	if *sound != "" {
-		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
+		deviceCallLog(&device, func(t tion.Tion, s *tion.Status) error {
 			if *sound == "on" {
 				s.SoundEnabled = true
 			} else {
@@ -113,7 +117,7 @@ func main() {
 	}
 
 	if *heater != "" {
-		deviceCall(&device, func(t tion.Tion, s *tion.Status) error {
+		deviceCallLog(&device, func(t tion.Tion, s *tion.Status) error {
 			if *heater == "on" {
 				s.HeaterEnabled = true
 			} else {
@@ -127,7 +131,6 @@ func main() {
 	if *scanp {
 		//scan()
 		panic("Not supported")
-		return
 	}
 
 	if *status {
@@ -137,7 +140,11 @@ func main() {
 			log.Printf("Connect error: %v\n", err)
 			return
 		}
-		defer t.Disconnect(device.timeout)
+		defer func() {
+			if err := t.Disconnect(device.timeout); err != nil {
+				log.Println(err)
+			}
+		}()
 		state, err := t.ReadState(device.timeout)
 		if err != nil {
 			log.Println(err)
@@ -147,13 +154,21 @@ func main() {
 
 	}
 }
-
+func deviceCallLog(device *cliDevice, cb func(tion.Tion, *tion.Status) error, succ string) {
+	if err := deviceCall(device, cb, succ); err != nil {
+		log.Println(err)
+	}
+}
 func deviceCall(device *cliDevice, cb func(tion.Tion, *tion.Status) error, succ string) error {
 	t := newDevice(device)
 	if err := t.Connect(device.timeout); err != nil {
 		return err
 	}
-	defer t.Disconnect(device.timeout)
+	defer func() {
+		if err := t.Disconnect(device.timeout); err != nil {
+			log.Println(err)
+		}
+	}()
 	s, err := t.ReadState(device.timeout)
 	if err != nil {
 		return err
@@ -170,8 +185,17 @@ func deviceCall(device *cliDevice, cb func(tion.Tion, *tion.Status) error, succ 
 
 func newDevice(device *cliDevice) tion.Tion {
 	if *device.device != "" {
-		return timpl.New(*device.device, *device.debug)
+		switch *device.driver {
+		case "muka":
+			return tion_muka.New(*device.device, *device.debug)
+		case "ppal":
+			return tion_ppal.New(*device.device, *device.debug)
+		case "gatt":
+			return tion_gatt.New(*device.device, *device.debug)
+		}
+		panic("Unknown driver " + *device.driver)
 	}
+
 	if *device.mqtt != "" {
 		return mqttcli.New(*device.mqtt, *device.mqttUser, *device.mqttPass, *device.mqttCa, *device.mqttTopic, *device.mqttAvalTopic, *device.mqttControlTopic, *device.debug)
 	}

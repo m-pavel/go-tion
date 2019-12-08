@@ -41,13 +41,16 @@ func (n *nativeTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 	if err := n.p.WriteCharacteristic(n.wc, tion.StatusRequest, true); err != nil {
 		return nil, err
 	}
-	time.Sleep(2 * time.Second)
-	resp, err := n.p.ReadCharacteristic(n.rc)
-	if err != nil {
-		return nil, err
-	}
-	if n.debug {
-		log.Printf("RSP [%d]: %v\n", len(resp), resp)
+	for try := 0; try < 5; try++ {
+		time.Sleep(2 * time.Second)
+		resp, err := n.p.ReadCharacteristic(n.rc)
+		if err != nil {
+			return nil, err
+		}
+		if n.debug {
+			log.Printf("RSP [%d]: %v\n", len(resp), resp)
+		}
+		log.Println(len(resp))
 	}
 	//resp, err = n.p.ReadCharacteristic(n.rc)
 	//if err != nil {
