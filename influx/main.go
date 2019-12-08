@@ -51,7 +51,9 @@ func main() {
 		if err != nil {
 			log.Fatalf("Unable send signal to the daemon: %v", err)
 		}
-		daemon.SendCommands(d)
+		if err := daemon.SendCommands(d); err != nil {
+			log.Println(err)
+		}
 		return
 	}
 
@@ -100,12 +102,11 @@ func daemonf(iserver, device string, interval int) {
 				erinr = 0
 			}
 			if erinr == 10 {
+				done <- struct{}{}
 				return
 			}
 		}
 	}
-
-	done <- struct{}{}
 }
 
 func reportInflux(i client.Client, s *tion.Status) {

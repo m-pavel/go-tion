@@ -6,8 +6,12 @@ all: test build
 
 deps:
 	${GF} go get -v -d ./...
+
 test: deps
 	${GF} go test -v $$(go list ./... | grep -v /vendor/)
+
+lint: deps
+	${GF} ${GOPATH}/bin/golangci-lint run -v ./...
 
 build-cli: deps
 	${GF} go build -o tion-cli ./cli

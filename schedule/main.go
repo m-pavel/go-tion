@@ -76,7 +76,7 @@ func main() {
 		if err != nil {
 			log.Println(err)
 		}
-		fmt.Printf(statush)
+		log.Println(statush)
 
 		fi := func(v *int) string {
 			if v == nil {
@@ -141,18 +141,21 @@ func main() {
 			speed = nil
 		}
 
-		err = dao.Add(*schedule, enb, htr, snd, gt, speed, temp)
-		if err != nil {
+		if err = dao.Add(*schedule, enb, htr, snd, gt, speed, temp); err != nil {
 			log.Println(err)
 		}
 		return
 	}
 
 	if *summer {
-		dao.UpdateHeater(false)
+		if err := dao.UpdateHeater(false); err != nil {
+			log.Println(err)
+		}
 	}
 	if *winter {
-		dao.UpdateHeater(true)
+		if err := dao.UpdateHeater(true); err != nil {
+			log.Println(err)
+		}
 	}
 
 	log.Println("Running daemon")
@@ -173,7 +176,9 @@ func main() {
 		if err != nil {
 			log.Fatalf("Unable send signal to the daemon: %v", err)
 		}
-		daemon.SendCommands(d)
+		if err := daemon.SendCommands(d); err != nil {
+			log.Println(err)
+		}
 		return
 	}
 
@@ -211,13 +216,13 @@ func daemonf(device string, dao *Dao, repeat int) {
 		go func(s Schedule) {
 			for {
 				expr := cronexpr.MustParse(s.Value).Next(time.Now())
-				mins := expr.Sub(time.Now()) / time.Minute
+				mins := time.Until(expr) / time.Minute
 				log.Printf("Next time for %d (%s) is %s in %d minute(s).\n", s.ID, fb(s.Enabled), expr.Format("Mon Jan _2 15:04:05 2006"), mins)
 				select {
 				case <-stop:
 					log.Println("Exiting")
 					break
-				case <-time.After(expr.Sub(time.Now())):
+				case <-time.After(time.Until(expr)):
 					log.Printf("Executing %d\n", s.ID)
 					for i := 0; i < repeat; i++ {
 						err := execute(s, device, 5, 5*time.Second)
@@ -239,7 +244,11 @@ func execute(s Schedule, device string, retry int, interval time.Duration) error
 	if err := t.Connect(timeout); err != nil {
 		return err
 	}
-	defer t.Disconnect(timeout)
+	defer func() {
+		if err := t.Disconnect(timeout); err != nil {
+			log.Println(err)
+		}
+	}()
 	ts, err := t.ReadState(timeout)
 	if err != nil {
 		return err

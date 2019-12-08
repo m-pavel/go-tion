@@ -67,8 +67,7 @@ func (d *Dao) GetSchedules() ([]Schedule, error) {
 			break
 		}
 		var s Schedule
-		rows.Scan(&s.ID, &s.Value, &s.Enabled, &s.Heater, &s.Sound, &s.Gate, &s.Speed, &s.Temp)
-		if err != nil {
+		if err := rows.Scan(&s.ID, &s.Value, &s.Enabled, &s.Heater, &s.Sound, &s.Gate, &s.Speed, &s.Temp); err != nil {
 			return nil, err
 		}
 		sch = append(sch, s)

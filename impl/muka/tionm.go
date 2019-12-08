@@ -113,7 +113,10 @@ func (n *mTion) Update(s *tion.Status, timeout time.Duration) error {
 			ec <- err
 			return
 		}
-		wc.WriteValue(tion.FromStatus(s), nil)
+		if err := wc.WriteValue(tion.FromStatus(s), nil); err != nil {
+			ec <- err
+			return
+		}
 		stc <- nil
 	})
 	return err

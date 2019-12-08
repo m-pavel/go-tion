@@ -85,7 +85,11 @@ func (ts TionService) Do() (interface{}, error) {
 	if err := ts.cmStart(); err != nil {
 		return nil, err
 	}
-	defer ts.cmEnd()
+	defer func() {
+		if err := ts.cmEnd(); err != nil {
+			log.Println(err)
+		}
+	}()
 	s, err := ts.t.ReadState(timeout)
 	if err != nil {
 		return nil, err
@@ -112,7 +116,11 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		log.Println(err)
 		return
 	}
-	defer ts.cmEnd()
+	defer func() {
+		if err := ts.cmEnd(); err != nil {
+			log.Println(err)
+		}
+	}()
 
 	cs, err := ts.t.ReadState(timeout)
 	if err != nil {
@@ -163,8 +171,11 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		if err = ts.t.Update(cs, timeout); err != nil {
 			log.Println(err)
 		} else {
-			ts.ss()
-			log.Println("Made update by MQTT request")
+			if err := ts.ss(); err != nil {
+				log.Println(err)
+			} else {
+				log.Println("Made update by MQTT request")
+			}
 		}
 	}
 
