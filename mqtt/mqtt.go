@@ -148,6 +148,20 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 			needupdate = true
 		}
 	}
+	// 4. Gate
+	if req.Gate != nil {
+		if cs.GateStatus() != *req.Gate {
+			cs.SetGateStatus(*req.Gate)
+			needupdate = true
+		}
+	}
+	// 5. Sound
+	if req.Sound != nil {
+		if cs.SoundEnabled != *req.Sound {
+			cs.SoundEnabled = *req.Sound
+			needupdate = true
+		}
+	}
 	// 77. State
 	if req.On != nil {
 		if cs.Enabled {
