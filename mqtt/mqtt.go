@@ -29,7 +29,7 @@ type TionService struct {
 	debug  bool
 	fake   *bool
 	keepbt *bool
-	ss     ghm.SendState
+	ctx    *ghm.ServiceContext
 }
 
 // PrepareCommandLineParams for TionService
@@ -43,8 +43,14 @@ func (ts *TionService) PrepareCommandLineParams() {
 // Name of TionService
 func (ts TionService) Name() string { return "tion" }
 
+func (ts *TionService) OnConnect(client MQTT.Client, topic, topicc, topica string) {
+	if token := client.Subscribe(topicc, 2, ts.control); token.WaitTimeout(timeout) && token.Error() != nil {
+		log.Println(token.Error())
+	}
+}
+
 // Init TionService
-func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, debug bool, ss ghm.SendState) error {
+func (ts *TionService) Init(ctx *ghm.ServiceContext) error {
 	go func() {
 		log.Println(http.ListenAndServe(":7070", nil))
 	}()
@@ -52,16 +58,11 @@ func (ts *TionService) Init(client MQTT.Client, topic, topicc, topica string, de
 		log.Println("Using fake device.")
 		ts.t = fake.NewFake()
 	} else {
-		ts.t = tionimpl.New(*ts.bt, debug)
+		ts.t = tionimpl.New(*ts.bt, ctx.Debug())
 	}
 
-	ts.debug = debug
-	ts.ss = ss
-
-	if token := client.Subscribe(topicc, 2, ts.control); token.WaitTimeout(timeout) && token.Error() != nil {
-		return token.Error()
-	}
-
+	ts.debug = ctx.Debug()
+	ts.ctx = ctx
 	if *ts.keepbt {
 		return ts.t.Connect(timeout)
 	}
@@ -185,7 +186,7 @@ func (ts *TionService) control(cli MQTT.Client, msg MQTT.Message) {
 		if err = ts.t.Update(cs, timeout); err != nil {
 			log.Println(err)
 		} else {
-			if err := ts.ss(); err != nil {
+			if err := ts.ctx.SendState(); err != nil {
 				log.Println(err)
 			} else {
 				log.Println("Made update by MQTT request")
