@@ -1,4 +1,6 @@
-package gatt
+// +build gatt
+
+package impl
 
 import (
 	"log"
@@ -8,10 +10,10 @@ import (
 
 	"github.com/go-errors/errors"
 	"github.com/m-pavel/go-gattlib/pkg"
-	tion2 "github.com/m-pavel/go-tion/tion"
+	"github.com/m-pavel/go-tion/tion"
 )
 
-type tion struct {
+type gattTion struct {
 	g     *gattlib.Gatt
 	Addr  string
 	debug bool
@@ -19,28 +21,28 @@ type tion struct {
 }
 
 // New gattlib backend
-func New(addr string, debug ...bool) tion2.Tion {
-	t := tion{Addr: addr, g: &gattlib.Gatt{}, mutex: &sync.Mutex{}}
+func NewTionImpl(addr string, debug ...bool) tion.Tion {
+	t := gattTion{Addr: addr, g: &gattlib.Gatt{}, mutex: &sync.Mutex{}}
 	if len(debug) == 1 && debug[0] {
 		t.debug = true
 	}
 	return &t
 }
 
-func (t tion) Info() string {
+func (t gattTion) Info() string {
 	return "github.com/m-pavel/go-tion/tion"
 }
 
 type cRes struct {
-	s *tion2.Status
+	s *tion.Status
 	e error
 }
 
-func (t tion) Connected() bool {
+func (t gattTion) Connected() bool {
 	return t.g.Connected()
 }
 
-func (t *tion) Connect(timeout time.Duration) error {
+func (t *gattTion) Connect(timeout time.Duration) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	if t.g.Connected() {
@@ -48,7 +50,7 @@ func (t *tion) Connect(timeout time.Duration) error {
 	}
 	return t.g.Connect(t.Addr)
 }
-func (t *tion) Disconnect(duration time.Duration) error {
+func (t *gattTion) Disconnect(duration time.Duration) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 	if t.g.Connected() {
@@ -57,7 +59,7 @@ func (t *tion) Disconnect(duration time.Duration) error {
 	return t.g.Disconnect()
 }
 
-func (t *tion) ReadState(readtimeout time.Duration) (*tion2.Status, error) {
+func (t *gattTion) ReadState(readtimeout time.Duration) (*tion.Status, error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
@@ -80,25 +82,25 @@ func (t *tion) ReadState(readtimeout time.Duration) (*tion2.Status, error) {
 	}
 }
 
-func (t *tion) rw() (*tion2.Status, error) {
+func (t *gattTion) rw() (*tion.Status, error) {
 	if !t.g.Connected() {
 		return nil, errors.New("Not connected")
 	}
-	if err := t.g.Write(tion2.WriteCaract, tion2.StatusRequest); err != nil {
+	if err := t.g.Write(tion.WriteCaract, tion.StatusRequest); err != nil {
 		return nil, err
 	}
 	time.Sleep(2 * time.Second)
-	resp, n, err := t.g.Read(tion2.ReadCharact)
+	resp, n, err := t.g.Read(tion.ReadCharact)
 	if err != nil {
 		return nil, err
 	}
 	if t.debug {
 		log.Printf("RSP [%d]: %v\n", n, resp)
 	}
-	return tion2.FromBytes(resp)
+	return tion.FromBytes(resp)
 }
 
-func (t *tion) Update(s *tion2.Status, timeout time.Duration) error {
+func (t *gattTion) Update(s *tion.Status, timeout time.Duration) error {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
@@ -109,7 +111,7 @@ func (t *tion) Update(s *tion2.Status, timeout time.Duration) error {
 	c1 := make(chan error, 1)
 
 	go func() {
-		c1 <- t.g.Write(tion2.WriteCaract, tion2.FromStatus(s))
+		c1 <- t.g.Write(tion.WriteCaract, tion.FromStatus(s))
 	}()
 
 	select {

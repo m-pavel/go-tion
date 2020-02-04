@@ -1,4 +1,6 @@
-package muka
+// +build muka
+
+package impl
 
 import (
 	"fmt"

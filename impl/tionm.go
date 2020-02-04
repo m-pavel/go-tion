@@ -1,4 +1,6 @@
-package muka
+// +build muka
+
+package impl
 
 import (
 	"errors"
@@ -28,7 +30,7 @@ func (n mTion) Info() string {
 }
 
 // New go ble backend
-func New(addr string, debug ...bool) tion.Tion {
+func NewTionImpl(addr string, debug ...bool) tion.Tion {
 	nt := mTion{addr: addr}
 	nt.st = NewSt()
 	if len(debug) > 0 {

@@ -1,4 +1,6 @@
-package fake
+// +build fake
+
+package impl
 
 import (
 	"time"
@@ -11,7 +13,7 @@ type fakeTion struct {
 }
 
 // NewFake backend
-func NewFake() tion.Tion {
+func NewTionImpl(addr string, debug ...bool) tion.Tion {
 	return &fakeTion{}
 }
 

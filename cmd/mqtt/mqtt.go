@@ -7,8 +7,7 @@ import (
 	_ "net/http"
 	_ "net/http/pprof"
 
-	"github.com/m-pavel/go-tion/impl/fake"
-	tionimpl "github.com/m-pavel/go-tion/impl/muka"
+	"github.com/m-pavel/go-tion/impl"
 
 	"time"
 
@@ -24,10 +23,10 @@ const timeout = 7 * time.Second
 
 // TionService instance
 type TionService struct {
-	t      tion.Tion
-	bt     *string
-	debug  bool
-	fake   *bool
+	t     tion.Tion
+	bt    *string
+	debug bool
+
 	keepbt *bool
 	ctx    *ghm.ServiceContext
 }
@@ -35,7 +34,6 @@ type TionService struct {
 // PrepareCommandLineParams for TionService
 func (ts *TionService) PrepareCommandLineParams() {
 	ts.bt = flag.String("device", "xx:yy:zz:aa:bb:cc", "Device BT address")
-	ts.fake = flag.Bool("fake", false, "Fake device")
 	ts.keepbt = flag.Bool("keepbt", false, "Keep bluetooth connection")
 
 }
@@ -54,13 +52,7 @@ func (ts *TionService) Init(ctx *ghm.ServiceContext) error {
 	go func() {
 		log.Println(http.ListenAndServe(":7070", nil))
 	}()
-	if *ts.fake {
-		log.Println("Using fake device.")
-		ts.t = fake.NewFake()
-	} else {
-		ts.t = tionimpl.New(*ts.bt, ctx.Debug())
-	}
-
+	ts.t = impl.NewTionImpl(*ts.bt, ctx.Debug())
 	ts.debug = ctx.Debug()
 	ts.ctx = ctx
 	if *ts.keepbt {

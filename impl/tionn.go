@@ -1,4 +1,6 @@
-package ppal
+// +build ppal
+
+package impl
 
 import (
 	"log"
@@ -20,7 +22,7 @@ type nativeTion struct {
 }
 
 // New go gatt backend
-func New(addr string, debug ...bool) tion.Tion {
+func NewTionImpl(addr string, debug ...bool) tion.Tion {
 	nt := nativeTion{addr: addr}
 	nt.cnct = make(chan error)
 	if len(debug) > 0 {

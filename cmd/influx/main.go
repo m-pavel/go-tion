@@ -9,12 +9,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/m-pavel/go-tion/impl"
+
 	"fmt"
 
 	"net/http"
 
 	"github.com/influxdata/influxdb1-client/v2"
-	tionimpl "github.com/m-pavel/go-tion/impl/muka"
+
 	"github.com/m-pavel/go-tion/tion"
 	"github.com/sevlyar/go-daemon"
 )
@@ -84,7 +86,7 @@ func daemonf(iserver, device string, interval int) {
 	}
 	defer cli.Close()
 
-	t := tionimpl.New(device)
+	t := impl.NewTionImpl(device)
 
 	erinr := 0
 	for {

@@ -7,13 +7,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/m-pavel/go-tion/impl"
+
 	"github.com/m-pavel/go-tion/tion"
 
 	"fmt"
 
 	"github.com/gorhill/cronexpr"
 
-	tionimpl "github.com/m-pavel/go-tion/impl/muka"
 	"github.com/sevlyar/go-daemon"
 )
 
@@ -240,7 +241,7 @@ func daemonf(device string, dao *Dao, repeat int) {
 }
 
 func execute(s Schedule, device string, retry int, interval time.Duration) error {
-	t := tionimpl.New(device)
+	t := impl.NewTionImpl(device)
 	if err := t.Connect(timeout); err != nil {
 		return err
 	}

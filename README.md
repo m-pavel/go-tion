@@ -57,7 +57,18 @@ Turn on/off
       "topic": "nn/tion-control"
     }
 ```
+## Building
+```
+    make GOARCH=<target arch> IMPL=<backend implementation>
+```
+GOARCH - https://golang.org/doc/install/source#environment
 
+IMPL - one of below
+  - muka https://github.com/muka/go-bluetooth backend implementation, default
+  - ppal
+  - gatt 
+  - fake 
+  - mqtt 
 ## Magic
  When getting 'Unexpected response length' with muka driver, run once with ppal driver
  

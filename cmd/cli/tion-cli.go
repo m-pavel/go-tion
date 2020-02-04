@@ -5,23 +5,16 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/m-pavel/go-tion/impl/fake"
+	"github.com/m-pavel/go-tion/impl"
 
 	"time"
 
-	tion_gatt "github.com/m-pavel/go-tion/impl/gatt"
-	"github.com/m-pavel/go-tion/impl/mqttcli"
-	tion_muka "github.com/m-pavel/go-tion/impl/muka"
-	tion_ppal "github.com/m-pavel/go-tion/impl/ppal"
 	"github.com/m-pavel/go-tion/tion"
 )
 
-// timpl "github.com/m-pavel/go-tion/tionm" works
-// timpl "github.com/m-pavel/go-tion/tionn"
-// timpl "github.com/m-pavel/go-tion/gatt" works
 type cliDevice struct {
-	device           *string
-	driver           *string
+	device *string
+
 	mqttUser         *string
 	mqttPass         *string
 	mqttCa           *string
@@ -35,7 +28,6 @@ type cliDevice struct {
 func main() {
 	device := cliDevice{}
 	device.device = flag.String("device", "", "BT (or MQTT) address")
-	device.driver = flag.String("driver", "muka", "driver")
 	device.mqttUser = flag.String("mqtt-user", "", "MQTT user")
 	device.mqttPass = flag.String("mqtt-pass", "", "MQTT password")
 	device.mqttCa = flag.String("mqtt-ca", "", "MQTT ca")
@@ -154,11 +146,13 @@ func main() {
 
 	}
 }
+
 func deviceCallLog(device *cliDevice, cb func(tion.Tion, *tion.Status) error, succ string) {
 	if err := deviceCall(device, cb, succ); err != nil {
 		log.Println(err)
 	}
 }
+
 func deviceCall(device *cliDevice, cb func(tion.Tion, *tion.Status) error, succ string) error {
 	t := newDevice(device)
 	if err := t.Connect(device.timeout); err != nil {
@@ -184,24 +178,7 @@ func deviceCall(device *cliDevice, cb func(tion.Tion, *tion.Status) error, succ 
 }
 
 func newDevice(device *cliDevice) tion.Tion {
-	if *device.device != "" {
-		switch *device.driver {
-		case "muka":
-			return tion_muka.New(*device.device, *device.debug)
-		case "ppal":
-			return tion_ppal.New(*device.device, *device.debug)
-		case "gatt":
-			return tion_gatt.New(*device.device, *device.debug)
-		case "mqtt":
-			return mqttcli.New(*device.device, *device.mqttUser, *device.mqttPass, *device.mqttCa, *device.mqttTopic, *device.mqttAvalTopic, *device.mqttControlTopic, *device.debug)
-		case "fake":
-			return fake.NewFake()
-		}
-		panic("Unknown driver " + *device.driver)
-	}
-
-	log.Panic("Unable to create device")
-	return nil
+	return impl.NewTionImpl(*device.device, *device.debug)
 }
 
 //func scan() {

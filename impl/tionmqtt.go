@@ -1,4 +1,6 @@
-package mqttcli
+// +build mqttcli
+
+package impl
 
 import (
 	"errors"
@@ -36,7 +38,7 @@ type mqttTion struct {
 }
 
 // New MQTT Tion backend
-func New(url, user, pass string, ca string, topic, topica, topicc string, dbg bool) tion.Tion {
+func NewTionImpl(url, user, pass string, ca string, topic, topica, topicc string, dbg bool) tion.Tion {
 	mqt := mqttTion{url: url, user: user, pass: pass, ca: ca, topic: topic, topica: topica, topicc: topicc, debug: dbg}
 	mqt.update = make(chan *tion.RestStatus)
 	return &mqt
