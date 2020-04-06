@@ -86,7 +86,7 @@ func daemonf(iserver, device string, interval int) {
 	}
 	defer cli.Close()
 
-	t := impl.NewTionImpl(device)
+	t := impl.NewTionImpl(device, false, nil)
 
 	erinr := 0
 	for {

@@ -30,12 +30,10 @@ func (n mTion) Info() string {
 }
 
 // New go ble backend
-func NewTionImpl(addr string, debug ...bool) tion.Tion {
+func NewTionImpl(addr string, debug bool, options map[string]string) tion.Tion {
 	nt := mTion{addr: addr}
 	nt.st = NewSt()
-	if len(debug) > 0 {
-		nt.debug = debug[0]
-	}
+	nt.debug = debug
 	return &nt
 }
 

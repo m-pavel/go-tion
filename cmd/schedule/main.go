@@ -241,7 +241,7 @@ func daemonf(device string, dao *Dao, repeat int) {
 }
 
 func execute(s Schedule, device string, retry int, interval time.Duration) error {
-	t := impl.NewTionImpl(device)
+	t := impl.NewTionImpl(device, false, nil)
 	if err := t.Connect(timeout); err != nil {
 		return err
 	}

@@ -22,12 +22,10 @@ type nativeTion struct {
 }
 
 // New go gatt backend
-func NewTionImpl(addr string, debug ...bool) tion.Tion {
+func NewTionImpl(addr string, debug bool, options map[string]string) tion.Tion {
 	nt := nativeTion{addr: addr}
 	nt.cnct = make(chan error)
-	if len(debug) > 0 {
-		nt.debug = debug[0]
-	}
+	nt.debug = debug
 	return &nt
 }
 

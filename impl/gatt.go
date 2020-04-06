@@ -21,12 +21,8 @@ type gattTion struct {
 }
 
 // New gattlib backend
-func NewTionImpl(addr string, debug ...bool) tion.Tion {
-	t := gattTion{Addr: addr, g: &gattlib.Gatt{}, mutex: &sync.Mutex{}}
-	if len(debug) == 1 && debug[0] {
-		t.debug = true
-	}
-	return &t
+func NewTionImpl(addr string, debug bool, options map[string]string) tion.Tion {
+	return &gattTion{Addr: addr, g: &gattlib.Gatt{}, mutex: &sync.Mutex{}, debug: debug}
 }
 
 func (t gattTion) Info() string {

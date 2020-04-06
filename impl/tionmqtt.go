@@ -38,8 +38,9 @@ type mqttTion struct {
 }
 
 // New MQTT Tion backend
-func NewTionImpl(url, user, pass string, ca string, topic, topica, topicc string, dbg bool) tion.Tion {
-	mqt := mqttTion{url: url, user: user, pass: pass, ca: ca, topic: topic, topica: topica, topicc: topicc, debug: dbg}
+func NewTionImpl(addr string, debug bool, options map[string]string) tion.Tion {
+	mqt := mqttTion{url: options["mqtt-url"], user: options["mqtt-user"], pass: options["mqtt-password"],
+		ca: options["mqtt-ca"], topic: options["mqtt-topic"], topica: options["mqtt-topic-a"], topicc: options["mqtt-topic-c"], debug: debug}
 	mqt.update = make(chan *tion.RestStatus)
 	return &mqt
 }

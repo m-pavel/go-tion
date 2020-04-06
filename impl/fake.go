@@ -13,7 +13,7 @@ type fakeTion struct {
 }
 
 // NewFake backend
-func NewTionImpl(addr string, debug ...bool) tion.Tion {
+func NewTionImpl(addr string, debug bool, options map[string]string) tion.Tion {
 	return &fakeTion{}
 }
 

@@ -52,7 +52,7 @@ func (ts *TionService) Init(ctx *ghm.ServiceContext) error {
 	go func() {
 		log.Println(http.ListenAndServe(":7070", nil))
 	}()
-	ts.t = impl.NewTionImpl(*ts.bt, ctx.Debug())
+	ts.t = impl.NewTionImpl(*ts.bt, ctx.Debug(), nil)
 	ts.debug = ctx.Debug()
 	ts.ctx = ctx
 	if *ts.keepbt {

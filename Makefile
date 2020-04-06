@@ -19,7 +19,8 @@ lint: deps
 	${GF} ${GOPATH}/bin/golint  $$(go list ./... | grep -v /vendor/)
 
 build-cli: deps
-	${GF} go build -o tion-cli ${TAGS} ./cmd/cli 
+	${GF} go build -o tion-cli ${TAGS} ./cmd/cli
+	${GF} go build -o tion-cli-mqtt -tags mqttcli ./cmd/cli
 
 build-influx: deps
 	${GF} go build -o tion-influx ${TAGS} ./cmd/influx
