@@ -27,6 +27,7 @@ type Status struct {
 	RunDays         int16
 	FirmwareVersion int16
 	Todo            int8
+	ResetFilters    bool
 }
 
 // GateStatus from int

@@ -125,7 +125,7 @@ func main() {
 
 	if *filtersReset {
 		deviceCallLog(&device, func(t tion.Tion, s *tion.Status) error {
-			s.FiltersRemains = 365
+			s.ResetFilters = true
 			return t.Update(s, device.timeout)
 		}, fmt.Sprintf("Reset filters to 365 days"))
 		return
