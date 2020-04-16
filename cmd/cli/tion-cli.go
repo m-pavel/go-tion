@@ -40,7 +40,7 @@ func main() {
 	var heater = flag.String("heater", "", "Heater on|off")
 	var gate = flag.String("gate", "", "Set gate position(indoor|outdoor|mixed)")
 	var timeoutp = flag.Int("timeout", 7, "Timeout seconds")
-	var filtersReset = flag.Bool("filters-reset", false, "Reset filter counter")
+	var filtersReset = flag.Bool("filters-reset", false, "Reset filters remain to 360 days")
 	flag.Parse()
 	device.options["mqtt-user"] = *mqttUser
 	device.options["mqtt-password"] = *mqttPass
