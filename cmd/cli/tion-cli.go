@@ -177,6 +177,9 @@ func deviceCall(device *cliDevice, cb func(tion.Tion, *tion.Status) error, succ 
 	if err != nil {
 		return err
 	}
+	if *device.debug {
+		log.Printf("STATE: %s", tion.Bytes(tion.FromStatus(s)))
+	}
 
 	err = cb(t, s)
 	if err != nil {
