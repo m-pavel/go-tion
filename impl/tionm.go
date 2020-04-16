@@ -123,7 +123,7 @@ func (n *mTion) Update(s *tion.Status, timeout time.Duration) error {
 	return err
 }
 
-func (n *mTion) Connect_(timeout time.Duration) error {
+func (n *mTion) Connect(timeout time.Duration) error {
 	_, err := n.st.Call(timeout, func(stc chan interface{}, ec chan error) {
 		if c, err := n.isConnected(); err != nil {
 			ec <- err
@@ -170,7 +170,7 @@ func (n *mTion) Connect_(timeout time.Duration) error {
 	return err
 }
 
-func (n *mTion) Connect(timeout time.Duration) error {
+func (n *mTion) Connect_(timeout time.Duration) error {
 	_, err := n.st.Call(timeout, func(stc chan interface{}, ec chan error) {
 		if c, err := n.isConnected(); err != nil {
 			ec <- err
