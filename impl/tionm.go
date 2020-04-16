@@ -81,7 +81,7 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 			return
 		}
 		if n.debug {
-			log.Printf("RSP: %v\n", data)
+			log.Printf("RSP: %v\n", tion.Bytes(data))
 		}
 
 		if status, err := tion.FromBytes(data); err != nil {

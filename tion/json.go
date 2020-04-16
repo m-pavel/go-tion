@@ -10,14 +10,14 @@ type RestStatus struct {
 	In            int8    `json:"temp_in"`
 	Target        *int8   `json:"temp_target"`
 	Speed         *int8   `json:"speed"`
-	FilterRemains int     `json:"filters"`
-	Firmware      int     `json:"firmware"`
+	FilterRemains int16   `json:"filters"`
+	Firmware      int16   `json:"firmware"`
 
-	Hours        int8 `json:"run_hours"`
-	Minutes      int8 `json:"run_minutes"`
-	ErrorCode    int8 `json:"error"`
-	Productivity int8 `json:"productivity"`
-	RunDays      int  `json:"run_days"`
+	Hours        int8  `json:"run_hours"`
+	Minutes      int8  `json:"run_minutes"`
+	ErrorCode    int8  `json:"error"`
+	Productivity int8  `json:"productivity"`
+	RunDays      int16 `json:"run_days"`
 }
 
 // RestFromStatus to RestStatus

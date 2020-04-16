@@ -19,13 +19,13 @@ type Status struct {
 	TempTarget      int8
 	TempOut         int8 // Outcoming from device - inside
 	TempIn          int8 // Incoming to device - outside
-	FiltersRemains  int
+	FiltersRemains  int16
 	Hours           int8
 	Minutes         int8
 	ErrorCode       int8
 	Productivity    int8 //m3pH
-	RunDays         int
-	FirmwareVersion int
+	RunDays         int16
+	FirmwareVersion int16
 	Todo            int8
 }
 
@@ -121,10 +121,12 @@ func rb(b *bytes2.Buffer) int8 {
 	return int8(bt & 0xFF)
 }
 
-func rub(b *bytes2.Buffer) int {
+func rub(b *bytes2.Buffer) int16 {
 	bt, _ := b.ReadByte()
-	return int(bt)
+	return int16(bt)
 }
-func ri(b *bytes2.Buffer) int {
-	return rub(b) + rub(b)<<8
+
+func ri(b *bytes2.Buffer) int16 {
+	iv := rub(b) + rub(b)<<8
+	return iv
 }

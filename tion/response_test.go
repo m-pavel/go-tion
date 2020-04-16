@@ -42,4 +42,17 @@ func TestInt(t *testing.T) {
 	}
 	fmt.Println(resp.BeautyString())
 	fmt.Println(resp.FirmwareVersion)
+	fmt.Println(resp.FiltersRemains)
+	fmt.Println(resp.RunDays)
+}
+
+func TestDays(t *testing.T) {
+	bts := []byte{179, 16, 34, 15, 10, 0, 13, 12, 10, 249, 255, 18, 16, 0, 45, 73, 1, 50, 0, 90}
+	resp, err := FromBytes(bts)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(resp.BeautyString())
+	fmt.Println(resp.FiltersRemains)
+	fmt.Println(resp.RunDays)
 }
