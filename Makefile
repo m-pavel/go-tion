@@ -38,4 +38,4 @@ clean:
 	rm -f ./tion-schedule
 	rm -f ./tion-cli
 	rm -f ./tion-mqtt
-
+	rm -f ./tion-cli-mqtt
