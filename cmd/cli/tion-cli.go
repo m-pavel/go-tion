@@ -127,7 +127,7 @@ func main() {
 		deviceCallLog(&device, func(t tion.Tion, s *tion.Status) error {
 			s.FiltersRemains = 365
 			return t.Update(s, device.timeout)
-		}, fmt.Sprintf("Heater set to %s", *heater))
+		}, fmt.Sprintf("Reset filters to 365 days"))
 		return
 	}
 	if *scanp {
