@@ -60,11 +60,11 @@ func (n *nativeTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 	//	log.Printf("RSP [%d]: %v\n", len(resp), resp)
 	//}
 	//return tion.FromBytes(resp)
-	return nil, errors.New("not implemented")
+	return nil, errors.New("ReadState not implemented")
 }
 
 func (n *nativeTion) Update(s *tion.Status, timeout time.Duration) error {
-	return errors.New("not implemented")
+	return errors.New("Update not implemented")
 }
 
 func (n *nativeTion) Connect(timeout time.Duration) error {
@@ -75,7 +75,7 @@ func (n *nativeTion) Connect(timeout time.Duration) error {
 
 	d, err := gatt.NewDevice(DefaultClientOptions...)
 	if err != nil {
-		return err
+		return fmt.Errorf("C1: %w", err)
 	}
 
 	d.Handle(
@@ -84,18 +84,21 @@ func (n *nativeTion) Connect(timeout time.Duration) error {
 		gatt.PeripheralDisconnected(n.onPeriphDisconnected),
 	)
 	if err = d.Init(onStateChanged); err != nil {
-		return err
+		return fmt.Errorf("C2: %w", err)
 	}
 
 	select {
 	case res := <-n.cnct:
 		return res
 	case <-time.After(timeout):
-		return fmt.Errorf("Connect timeout (%d)", timeout)
+		return fmt.Errorf("C3: Connect timeout %.2fs", timeout.Seconds())
 	}
 }
 
 func (n *nativeTion) onPeriphDiscovered(p gatt.Peripheral, a *gatt.Advertisement, rssi int) {
+	if n.debug {
+		log.Printf("Discovered %s %s", p.Name(), p.ID())
+	}
 	if p.ID() == n.addr {
 		p.Device().StopScanning()
 		p.Device().Connect(p)
@@ -160,7 +163,7 @@ func (n *nativeTion) onPeriphDisconnected(p gatt.Peripheral, err error) {
 func onStateChanged(d gatt.Device, s gatt.State) {
 	switch s {
 	case gatt.StatePoweredOn:
-		log.Printf("Scanning...")
+		log.Printf("Scanning with %v...", d)
 		d.Scan([]gatt.UUID{}, false)
 		return
 	default:

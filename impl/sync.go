@@ -4,7 +4,6 @@ package impl
 
 import (
 	"fmt"
-	"log"
 	"sync"
 	"time"
 )
@@ -38,7 +37,6 @@ func (sm *SyncTimeout) Call(timeout time.Duration, callback Callback) (interface
 	case data := <-dc:
 		return data, nil
 	case err := <-ec:
-		log.Println(err)
 		return nil, err
 	case <-time.After(timeout):
 		return nil, fmt.Errorf("calltimeout %.2f sec", timeout.Seconds())

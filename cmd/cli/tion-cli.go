@@ -52,7 +52,7 @@ func main() {
 
 	device.timeout = time.Duration(*timeoutp) * time.Second
 	if *device.device == "" {
-		log.Fatal("Device address or MQTT is mandatory")
+		log.Fatal("Device BT address or MQTT endpoint is mandatory")
 	}
 
 	if *on {

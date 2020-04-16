@@ -4,6 +4,7 @@ package impl
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"log"
@@ -52,7 +53,7 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 			return
 		} else {
 			if !c {
-				ec <- errors.New("Not connected")
+				ec <- errors.New("R1: Not connected")
 				return
 			}
 		}
@@ -61,22 +62,22 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 
 		wc, err := n.d.GetCharByUUID(tion.WriteCaract)
 		if err != nil {
-			ec <- err
+			ec <- fmt.Errorf("R2: %w", err)
 			return
 		}
 		if err := wc.WriteValue(tion.StatusRequest, nil); err != nil {
-			ec <- err
+			ec <- fmt.Errorf("R3: %w", err)
 			return
 		}
 		time.Sleep(200 * time.Millisecond)
 		rc, err := n.d.GetCharByUUID(tion.ReadCharact)
 		if err != nil {
-			ec <- err
+			ec <- fmt.Errorf("R4: %w", err)
 			return
 		}
 
 		if data, err = rc.ReadValue(nil); err != nil {
-			ec <- err
+			ec <- fmt.Errorf("R5: %w", err)
 			return
 		}
 		if n.debug {
@@ -84,7 +85,7 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 		}
 
 		if status, err := tion.FromBytes(data); err != nil {
-			ec <- err
+			ec <- fmt.Errorf("R6: %w", err)
 		} else {
 			stc <- status
 		}
@@ -100,21 +101,68 @@ func (n *mTion) ReadState(timeout time.Duration) (*tion.Status, error) {
 func (n *mTion) Update(s *tion.Status, timeout time.Duration) error {
 	_, err := n.st.Call(timeout, func(stc chan interface{}, ec chan error) {
 		if c, err := n.isConnected(); err != nil {
-			ec <- err
+			ec <- fmt.Errorf("U1: %w", err)
 			return
 		} else {
 			if !c {
-				ec <- errors.New("Not connected")
+				ec <- errors.New("U1: Not connected")
 				return
 			}
 		}
 		wc, err := n.d.GetCharByUUID(tion.WriteCaract)
 		if err != nil {
-			ec <- err
+			ec <- fmt.Errorf("U2: %w", err)
 			return
 		}
 		if err := wc.WriteValue(tion.FromStatus(s), nil); err != nil {
+			ec <- fmt.Errorf("U3: %w", err)
+			return
+		}
+		stc <- nil
+	})
+	return err
+}
+
+func (n *mTion) Connect_(timeout time.Duration) error {
+	_, err := n.st.Call(timeout, func(stc chan interface{}, ec chan error) {
+		if c, err := n.isConnected(); err != nil {
 			ec <- err
+			return
+		} else {
+			if c {
+				ec <- nil
+				return
+			}
+		}
+		ad, err := api.GetDefaultAdapter()
+		if err != nil {
+			ec <- fmt.Errorf("C1: %w", err)
+			return
+		}
+		if n.d, err = ad.GetDeviceByAddress(n.addr); err != nil {
+			ec <- fmt.Errorf("C2: %w", err)
+			return
+		}
+		if n.d == nil {
+			ec <- fmt.Errorf("C3: Device %s not available", n.addr)
+			return
+		}
+		if p, err := n.d.GetPaired(); err != nil {
+			ec <- fmt.Errorf("C4: %w", err)
+			return
+		} else {
+			if !p {
+				ec <- fmt.Errorf("C5: Device %s is not paired. Pair with bluetoothctrl", n.addr)
+				return
+			}
+		}
+		if err = n.d.Connect(); err != nil {
+			ec <- fmt.Errorf("C6: %w", err)
+			return
+		}
+		time.Sleep(time.Second)
+		if _, err := n.d.GetDescriptorList(); err != nil {
+			ec <- fmt.Errorf("C7: %w", err)
 			return
 		}
 		stc <- nil
@@ -135,35 +183,44 @@ func (n *mTion) Connect(timeout time.Duration) error {
 		}
 		ad, err := api.GetDefaultAdapter()
 		if err != nil {
-			ec <- err
+			ec <- fmt.Errorf("C1: %w", err)
 			return
 		}
-		if n.d, err = ad.GetDeviceByAddress(n.addr); err != nil {
-			ec <- err
+		chn, cancel, err := ad.OnDeviceDiscovered()
+		if err != nil {
+			ec <- fmt.Errorf("C2: %w", err)
 			return
 		}
-		if n.d == nil {
-			ec <- fmt.Errorf("Device %s not available", n.addr)
+		err = ad.StartDiscovery()
+		if err != nil {
+			ec <- fmt.Errorf("C3: %w", err)
 			return
 		}
-		if p, err := n.d.GetPaired(); err != nil {
-			ec <- err
-			return
-		} else {
-			if !p {
-				ec <- fmt.Errorf("Device %s is not paired. Pair with bluetoothctrl", n.addr)
+
+		defer func() {
+			err := ad.StopDiscovery()
+			if err != nil {
+				log.Println(err)
+			}
+			cancel()
+		}()
+
+		spl := strings.Split(n.addr, ":")
+		pathsuffix := fmt.Sprintf("%s_%s_%s_%s_%s_%s", spl[0], spl[1], spl[2], spl[3], spl[4], spl[5])
+
+		for {
+			select {
+			case dev := <-chn:
+				if strings.HasSuffix(string(dev.Path), pathsuffix) {
+					log.Printf("Found %s", dev.Path)
+					break
+				}
+			case <-time.After(timeout):
+				ec <- fmt.Errorf("C4: discovery timout %.2fs", timeout.Seconds())
 				return
 			}
 		}
-		if err = n.d.Connect(); err != nil {
-			ec <- err
-			return
-		}
-		time.Sleep(time.Second)
-		if _, err := n.d.GetDescriptorList(); err != nil {
-			ec <- err
-			return
-		}
+		ad.GetGattManager()
 		stc <- nil
 	})
 	return err
@@ -184,7 +241,7 @@ func (n *mTion) Disconnect(timeout time.Duration) error {
 				n.d = nil
 			}()
 			if c, err := n.isConnected(); err != nil {
-				ec <- err
+				ec <- fmt.Errorf("D1: %w", err)
 				return
 			} else {
 				if !c {
@@ -193,7 +250,7 @@ func (n *mTion) Disconnect(timeout time.Duration) error {
 				}
 			}
 			if err := n.d.Disconnect(); err != nil {
-				ec <- err
+				ec <- fmt.Errorf("D2: %w", err)
 				return
 			}
 			stc <- nil
