@@ -40,6 +40,7 @@ func main() {
 	var heater = flag.String("heater", "", "Heater on|off")
 	var gate = flag.String("gate", "", "Set gate position(indoor|outdoor|mixed)")
 	var timeoutp = flag.Int("timeout", 7, "Timeout seconds")
+	var filtersReset = flag.Bool("filters-reset", false, "Reset filter counter")
 	flag.Parse()
 	device.options["mqtt-user"] = *mqttUser
 	device.options["mqtt-password"] = *mqttPass
@@ -122,6 +123,13 @@ func main() {
 		return
 	}
 
+	if *filtersReset {
+		deviceCallLog(&device, func(t tion.Tion, s *tion.Status) error {
+			s.FiltersRemains = 365
+			return t.Update(s, device.timeout)
+		}, fmt.Sprintf("Heater set to %s", *heater))
+		return
+	}
 	if *scanp {
 		//scan()
 		panic("Not supported")
