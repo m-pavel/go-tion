@@ -150,6 +150,16 @@ func (n *nativeTion) onPeriphConnected(p gatt.Peripheral, err error) {
 	n.cnct <- nil
 }
 
+func (n *nativeTion) reqdNotification(c *gatt.Characteristic, data []byte, err error) {
+	log.Printf("Notification %s", data)
+	log.Println(err)
+}
+
+func (n *nativeTion) onPeriphDisconnected(p gatt.Peripheral, err error) {
+	log.Printf("Periph disconnected %s:%s", p.ID(), p.Name())
+	n.p = nil
+	n.cnct <- err
+}
 func onStateChanged(d gatt.Device, s gatt.State) {
 	switch s {
 	case gatt.StatePoweredOn:
