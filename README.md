@@ -1,4 +1,4 @@
-# Tion Breazer 3S Go API
+# Tion Breazer 3S Go API and Clients
 There are thee backend available:
   - https://github.com/m-pavel/go-gattlib
   - https://github.com/paypal/gatt
