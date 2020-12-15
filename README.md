@@ -71,4 +71,13 @@ IMPL - one of below
   - mqtt 
 ## Magic
  When getting 'Unexpected response length' with muka driver, run once with ppal driver
+ In fact it performs adaptor reset like below
+ ```
+ sudo hciconfig hci0 up
+ sudo hciconfig hci0 reset
+ sudo hciconfig hci0 down
+ sudo hciconfig hci0 up
+```
+
+
  
