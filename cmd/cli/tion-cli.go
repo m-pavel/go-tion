@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/paypal/gatt/linux"
 	"log"
 
 	"github.com/m-pavel/go-tion/impl"
@@ -41,6 +42,7 @@ func main() {
 	var gate = flag.String("gate", "", "Set gate position(indoor|outdoor|mixed)")
 	var timeoutp = flag.Int("timeout", 7, "Timeout seconds")
 	var filtersReset = flag.Bool("filters-reset", false, "Reset filters remain to 360 days")
+	var reset = flag.Bool("reset", false, "Reset BT adaptor")
 	flag.Parse()
 	device.options["mqtt-user"] = *mqttUser
 	device.options["mqtt-password"] = *mqttPass
@@ -52,6 +54,16 @@ func main() {
 	log.SetFlags(log.Lshortfile | log.Ltime | log.Ldate)
 
 	device.timeout = time.Duration(*timeoutp) * time.Second
+
+	if *reset {
+		if h, err := linux.NewHCI(-1, true, 1); err != nil {
+			log.Printf("Unable reset device: %v", err)
+		} else {
+			log.Printf("Reset successful")
+			h.Close()
+		}
+		return
+	}
 	if *device.device == "" {
 		log.Fatal("Device BT address or MQTT endpoint is mandatory")
 	}
